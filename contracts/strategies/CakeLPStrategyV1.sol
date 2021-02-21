@@ -3,9 +3,9 @@
 pragma solidity 0.7.4;
 
 import "@openzeppelin/contracts/GSN/Context.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -25,7 +25,7 @@ import "../interfaces/IMasterChef.sol";
  * 
  * This strat is currently compatible with all LP pools.
  */
-contract StrategyCakeLP is Ownable, Pausable {
+contract CakeLPStrategyV1 is Ownable, Pausable {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
