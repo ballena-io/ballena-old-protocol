@@ -1,4 +1,4 @@
-// contracts/gobernance/IRewardDistributionRecipient.sol
+// contracts/interfaces/IRewardDistributionRecipient.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.4;
 
