@@ -1,4 +1,4 @@
-// contracts/vaults/CakeLPStrategyV1.sol
+// contracts/strategies/CakeLPStrategyV1.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.4;
 
@@ -38,9 +38,9 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      * {lpPair} - Token that the strategy maximizes. The same token that users deposit in the vault.
      * {lpToken0, lpToken1} - Tokens that the strategy maximizes. IPancakePair tokens
      */
-    address constant public wbnb = address(0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c);
-    address constant public cake = address(0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82);
-    address constant public balle = address(0xCa3F508B8e4Dd382eE878A314789373D80A5190A);
+    address public wbnb;
+    address public balle;
+    address public cake;
     address public lpPair;
     address public lpToken0;
     address public lpToken1;
@@ -51,8 +51,8 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      * {masterchef} - MasterChef contract
      * {poolId} - MasterChef pool id
      */
-    address constant public unirouter  = address(0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F);
-    address constant public masterchef = address(0x73feaa1eE314F8c655E354234017bE2193C9E24E);
+    address public unirouter;
+    address public masterchef;
     uint8 public poolId; 
 
     /**
@@ -61,8 +61,8 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      * {treasury} - Address of the Ballena.io treasury
      * {vault} - Address of the vault that controls the strategy's funds.
      */
-    address constant public rewards  = address(0x453D4Ba9a2D594314DF88564248497F7D74d6b2C);
-    address constant public treasury = address(0x4A32De8c248533C28904b24B4cFCFE18E9F2ad01);
+    address public rewards;
+    address public treasury;
     address public vault;
 
     /**
@@ -92,8 +92,8 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      * {cakeToLp0Route} - Route we take to get from {cake} into {lpToken0}.
      * {cakeToLp1Route} - Route we take to get from {cake} into {lpToken1}.
      */
-    address[] public cakeToWbnbRoute = [cake, wbnb];
-    address[] public wbnbToBalleRoute = [wbnb, balle];
+    address[] public cakeToWbnbRoute;
+    address[] public wbnbToBalleRoute;
     address[] public cakeToLp0Route;
     address[] public cakeToLp1Route;
 
@@ -105,12 +105,33 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
     /**
      * @dev Initializes the strategy with the token to maximize.
      */
-    constructor(address _lpPair, uint8 _poolId, address _vault) {
+    constructor(
+        address _wbnb, 
+        address _balle, 
+        address _cake, 
+        address _unirouter, 
+        address _masterchef, 
+        address _lpPair, 
+        uint8 _poolId, 
+        address _rewards, 
+        address _treasury, 
+        address _vault
+    ) {
+        wbnb = _wbnb;
+        balle = _balle;
+        cake = _cake;
+        unirouter = _unirouter;
+        masterchef = _masterchef;
         lpPair = _lpPair;
         lpToken0 = IPancakePair(lpPair).token0();
         lpToken1 = IPancakePair(lpPair).token1();
         poolId = _poolId;
+        rewards = _rewards;
+        treasury = _treasury;
         vault = _vault;
+
+        cakeToWbnbRoute = [cake, wbnb];
+        wbnbToBalleRoute = [wbnb, balle];
 
         if (lpToken0 == wbnb) {
             cakeToLp0Route = [cake, wbnb];
