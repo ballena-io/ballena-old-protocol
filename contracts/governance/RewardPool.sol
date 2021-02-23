@@ -14,7 +14,6 @@ import "./LPTokenWrapper.sol";
 
 /**********************************************
  * TO-DO List:
- *   - Implement reward 10% fee (getReward)
  *   - Implement application of multiplier on reward calculation (getReward)
  *   - Implement separation between rewards funds and extra reward funds (maybe in other contract)
  *
@@ -34,6 +33,17 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
+    address public treasury;
+
+    /**
+     * @dev Reward Fee paid to treasury.
+     *
+     * {REWARD_FEE} - Fee taxed when a governance token holder gets his reward. 100 === 10% fee.
+     * {REWARD_MAX} - Aux const used to safely calc the correct amounts.
+     */
+    uint constant public REWARD_FEE = 100;
+    uint constant public REWARD_MAX = 1000;
+
     event SetMultiplier(uint16 multiplier);
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
@@ -42,11 +52,13 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
 
     constructor (
         address _wbnb, 
-        address _balle
+        address _balle,
+        address _treasury
     ) LPTokenWrapper(
         address(_balle)
     ) {
         wbnb = IERC20(_wbnb);
+        treasury = _treasury;
     }
 
     modifier updateReward(address account) {
@@ -107,8 +119,13 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     function getReward() public updateReward(msg.sender) {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
+            
+            uint256 rewardFee = reward.mul(REWARD_FEE).div(REWARD_MAX);
+            IERC20(balle).safeTransfer(treasury, rewardFee);
+
             rewards[msg.sender] = 0;
-            balle.safeTransfer(msg.sender, reward);
+            balle.safeTransfer(msg.sender, reward.sub(rewardFee));
+
             emit RewardPaid(msg.sender, reward);
         }
     }
