@@ -29,12 +29,13 @@ contract BalleVaultV1 is ERC20, Ownable {
     // The last proposed strategy to switch to.
     StratCandidate public stratCandidate; 
     // The strategy currently in use by the vault.
-    address public strategy;
+    address public strategy = address(0);
     // The token the vault accepts and looks to maximize.
     IERC20 public token;
     // The minimum time it has to pass before a strat candidate can be approved.
     uint256 public immutable approvalDelay;
 
+    event SetStrategy(address implementation);
     event NewStratCandidate(address implementation);
     event UpgradeStrat(address implementation);
     
@@ -44,14 +45,12 @@ contract BalleVaultV1 is ERC20, Ownable {
      * This token is minted when someone does a deposit. It is burned in order
      * to withdraw the corresponding portion of the underlying assets.
      * @param _token the token to maximize.
-     * @param _strategy the address of the strategy.
      * @param _name the name of the vault token.
      * @param _symbol the symbol of the vault token.
      * @param _approvalDelay the delay before a new strat can be approved.
      */
     constructor (
         address _token, 
-        address _strategy, 
         string memory _name, 
         string memory _symbol, 
         uint256 _approvalDelay
@@ -60,8 +59,19 @@ contract BalleVaultV1 is ERC20, Ownable {
         string(_symbol)
     ) {
         token = IERC20(_token);
-        strategy = _strategy;
         approvalDelay = _approvalDelay;
+    }
+
+    /** 
+     * @dev Sets the initial strategy to use with this vault.
+     * @param _implementation The address of the strategy.  
+     */
+    function setStrategy(address _implementation) public onlyOwner {
+        require(strategy == address(0), "There is already a strategy");
+        require(_implementation != address(0), "Invalid strategy");
+        strategy = _implementation;
+    
+        emit SetStrategy(_implementation);
     }
 
     /**
