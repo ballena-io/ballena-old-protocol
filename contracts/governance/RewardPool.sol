@@ -14,7 +14,6 @@ import "./LPTokenWrapper.sol";
 
 /**********************************************
  * TO-DO List:
- *   - Implement application of multiplier on reward calculation (getReward)
  *   - Implement separation between rewards funds and extra reward funds (maybe in other contract)
  *
  **********************************************/
@@ -94,6 +93,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
             balanceOf(account)
                 .mul(rewardPerToken().sub(userRewardPerTokenPaid[account]))
                 .div(1e18)
+                .mul(multiplier)
                 .add(rewards[account]);
     }
 
