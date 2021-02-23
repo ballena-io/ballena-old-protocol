@@ -14,7 +14,6 @@ import "./LPTokenWrapper.sol";
 
 /**********************************************
  * TO-DO List:
- *   - Change rewards payment from BNB to BALLE
  *   - Implement reward 10% fee (getReward)
  *   - Implement application of multiplier on reward calculation (getReward)
  *   - Implement separation between rewards funds and extra reward funds (maybe in other contract)
@@ -109,7 +108,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            wbnb.safeTransfer(msg.sender, reward);
+            balle.safeTransfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);
         }
     }
