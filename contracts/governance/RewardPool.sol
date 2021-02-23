@@ -16,7 +16,6 @@ import "./LPTokenWrapper.sol";
  * TO-DO List:
  *   - Change rewards payment from BNB to BALLE
  *   - Implement reward 10% fee (getReward)
- *   - Add external function to set reward multiplier
  *   - Implement application of multiplier on reward calculation (getReward)
  *   - Implement separation between rewards funds and extra reward funds (maybe in other contract)
  *
@@ -28,6 +27,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     IERC20 public wbnb;
     uint256 public constant DURATION = 1 days;
 
+    uint16 public multiplier = 1;
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
     uint256 public lastUpdateTime;
@@ -35,6 +35,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
+    event SetMultiplier(uint16 multiplier);
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
@@ -129,4 +130,16 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         periodFinish = block.timestamp.add(DURATION);
         emit RewardAdded(reward);
     }
+
+    function setMultiplier(uint16 _multiplier)
+        external
+        onlyOwner
+    {
+        require(_multiplier <= 10000, "Multiplier too high");
+        require(_multiplier > 0, "Multiplier too low");
+        multiplier = _multiplier;
+
+        emit SetMultiplier(_multiplier);
+    }
+
 }
