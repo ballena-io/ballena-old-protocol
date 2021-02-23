@@ -1,4 +1,4 @@
-// contracts/vaults/BalleTreasury.sol
+// contracts/treasury/BalleTreasury.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.4;
 
