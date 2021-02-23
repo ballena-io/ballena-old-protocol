@@ -12,15 +12,20 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IRewardDistributionRecipient.sol";
 import "./LPTokenWrapper.sol";
 
-/**
- * TO-DO:
- *   - Implement reward multiplier
- */
+/**********************************************
+ * TO-DO List:
+ *   - Change rewards payment from BNB to BALLE
+ *   - Implement reward 10% fee (getReward)
+ *   - Add external function to set reward multiplier
+ *   - Implement application of multiplier on reward calculation (getReward)
+ *   - Implement separation between rewards funds and extra reward funds (maybe in other contract)
+ *
+ **********************************************/
 contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    IERC20 public wbnb = IERC20(0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c);
+    IERC20 public wbnb;
     uint256 public constant DURATION = 1 days;
 
     uint256 public periodFinish = 0;
@@ -34,6 +39,15 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event RewardPaid(address indexed user, uint256 reward);
+
+    constructor (
+        address _wbnb, 
+        address _balle
+    ) LPTokenWrapper(
+        address(_balle)
+    ) {
+        wbnb = IERC20(_wbnb);
+    }
 
     modifier updateReward(address account) {
         rewardPerTokenStored = rewardPerToken();
@@ -78,6 +92,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         emit Staked(msg.sender, amount);
     }
 
+    // withdraw visibility is public as overriding LPTokenWrapper's withdraw() function
     function withdraw(uint256 amount) public override updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
         super.withdraw(amount);
