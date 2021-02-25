@@ -21,7 +21,7 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const fs = require('fs');
 const bscTestnetConfig = require('.env.bsc_testnet.json');
-const bscMainnetConfig = require('.env.bsc_testnet.json');
+const bscMainnetConfig = require('.env.bsc_mainnet.json');
 
 require('ts-node').register({
   files: true,
