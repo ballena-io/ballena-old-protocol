@@ -9,4 +9,7 @@ interface IStrategy {
     function balanceOf() external view returns (uint256);
     function harvest() external;
     function retireStrat() external;
+    function panic() external;
+    function pause() external;
+    function unpause() external;
 }
