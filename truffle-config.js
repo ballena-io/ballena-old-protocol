@@ -18,13 +18,22 @@
  *
  */
 
-// const infuraKey = "fj4jll3k.....";
-//
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const fs = require('fs');
-const mnemonic = fs.readFileSync(".secret").toString().trim();
+const bscTestnetConfig = require('.env.bsc_testnet.json');
+const bscMainnetConfig = require('.env.bsc_testnet.json');
+
+require('ts-node').register({
+  files: true,
+});
 
 module.exports = {
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    bscscan: bscMainnetConfig.bscscan_api_key
+  },
   /**
    * Networks define how you connect to your ethereum client and let you set the
    * defaults web3 uses to send transactions. If you don't specify one truffle
@@ -34,22 +43,21 @@ module.exports = {
    *
    * $ truffle test --network <network-name>
    */
-
   networks: {
     development: {
       host: "127.0.0.1",
       port: 8545,
       network_id: "*",
     },
-    testnet: {
-      provider: () => new HDWalletProvider(mnemonic, "https://data-seed-prebsc-1-s2.binance.org:8545/"),
+    bsc_testnet: {
+      provider: () => new HDWalletProvider(bscTestnetConfig.wallets, "https://data-seed-prebsc-1-s2.binance.org:8545/", 0, 2),
       network_id: 97,
       confirmations: 5,
       timeoutBlocks: 200,
       skipDryRun: true
     },
-    bsc: {
-      provider: () => new HDWalletProvider(mnemonic, "https://bsc-dataseed.binance.org/"),
+    bsc_mainnet: {
+      provider: () => new HDWalletProvider(bscMainnetConfig.wallets, "https://bsc-dataseed.binance.org/", 0, 2),
       network_id: 56,
       confirmations: 10,
       timeoutBlocks: 200,

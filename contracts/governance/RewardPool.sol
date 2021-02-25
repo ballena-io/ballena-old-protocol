@@ -92,8 +92,8 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         return
             balanceOf(account)
                 .mul(rewardPerToken().sub(userRewardPerTokenPaid[account]))
-                .div(1e18)
                 .mul(multiplier)
+                .div(1e18)
                 .add(rewards[account]);
     }
 
@@ -119,13 +119,10 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     function getReward() public updateReward(msg.sender) {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
-            
+            rewards[msg.sender] = 0;
             uint256 rewardFee = reward.mul(REWARD_FEE).div(REWARD_MAX);
             IERC20(balle).safeTransfer(treasury, rewardFee);
-
-            rewards[msg.sender] = 0;
             balle.safeTransfer(msg.sender, reward.sub(rewardFee));
-
             emit RewardPaid(msg.sender, reward);
         }
     }
