@@ -11,7 +11,7 @@ module.exports = async function (deployer, network, accounts) {
   const networkConfig = JSON.parse(fs.readFileSync(`.env.${network}.json`));
 
   // Set external addresses
-  const wbnbAddress;
+  var wbnbAddress;
   if (network == "development") {
     // mock contracts
     const wbnb = await WBNB.deployed();

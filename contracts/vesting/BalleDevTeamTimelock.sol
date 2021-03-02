@@ -35,7 +35,7 @@ contract BalleDevTeamTimelock {
     ) {
         // solhint-disable-next-line not-rely-on-time
         require(
-            releaseTime > block.timestamp,
+            _releaseTime > block.timestamp,
             "BalleDevTeamTimelock: release time is before current time"
         );
         balle = IERC20(_balle);

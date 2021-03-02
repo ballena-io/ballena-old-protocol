@@ -5,8 +5,10 @@
   "main": "truffle-config.js",
   "scripts": {
     "generate-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
-    "compile": "rimraf build/contracts && npx truffle compile && npm run generate-types",
-    "postinstall": "npm run compile"
+    "compile": "rimraf build/contracts && npx truffle compile && yarn generate-types",
+    "migrate": "npx truffle migrate --network development",
+    "postinstall": "yarn compile",
+    "test": "npx truffle test"
   },
   "keywords": [],
   "author": "",

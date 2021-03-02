@@ -12,7 +12,7 @@ module.exports = async function (deployer, network, accounts) {
 
     if (network == "development") {
       // deploy mock token contracts
-      await deployer.deploy(WBNB, "Wrapped BNB", "WBNB");
+      await deployer.deploy(WBNB);
     }
   } 
 };
