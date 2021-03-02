@@ -5,7 +5,7 @@
   "main": "truffle-config.js",
   "scripts": {
     "generate-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
-    "compile": "npx truffle compile && npm run generate-types",
+    "compile": "rimraf build/contracts && npx truffle compile && npm run generate-types",
     "postinstall": "npm run compile"
   },
   "keywords": [],
@@ -19,6 +19,7 @@
     "@types/mocha": "^8.2.1",
     "@types/node": "^14.14.31",
     "ganache-cli": "^6.12.2",
+    "rimraf": "^3.0.2",
     "truffle": "^5.1.66",
     "truffle-plugin-verify": "^0.5.5",
     "ts-node": "^9.1.1",
