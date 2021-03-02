@@ -15,13 +15,13 @@ module.exports = async function (deployer, network, accounts) {
     const rewardPool = await RewardPool.deployed();
     const vaultRewardPool = await VaultRewardPool.deployed();
 
-    await balleToken.mint(rewardPool.address, 13300)
+    await balleToken.mint(rewardPool.address, 13000)
     await balleToken.mint(vaultRewardPool.address, 24000)
 
     for (i=0; i<networkConfig.devTeamVestingAddress.length-1; i++) {
       await balleToken.mint(networkConfig.devTeamVestingAddress[i], 400)
     }
     await balleToken.mint(networkConfig.devTeamTimelockAddress, 600)
-
   }
+
 };
