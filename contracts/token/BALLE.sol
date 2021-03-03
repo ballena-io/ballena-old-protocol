@@ -12,22 +12,22 @@ contract BALLE is ERC20 {
         governance = msg.sender;
     }
 
-    function mint(address account, uint256 amount) public {
+    function mint(address account, uint256 amount) external {
         require(minters[msg.sender], "!minter");
         _mint(account, amount);
     }
 
-    function setGovernance(address _governance) public {
+    function setGovernance(address _governance) external {
         require(msg.sender == governance, "!governance");
         governance = _governance;
     }
 
-    function addMinter(address _minter) public {
+    function addMinter(address _minter) external {
         require(msg.sender == governance, "!governance");
         minters[_minter] = true;
     }
 
-    function removeMinter(address _minter) public {
+    function removeMinter(address _minter) external {
         require(msg.sender == governance, "!governance");
         minters[_minter] = false;
     }
