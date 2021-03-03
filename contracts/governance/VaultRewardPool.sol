@@ -16,11 +16,9 @@ contract VaultRewardPool is Ownable {
     using SafeMath for uint256;
 
     IERC20 public balle;
-    uint256 public startTime;
-    uint256 public endTime;
-    uint256 public constant DURATION = 365 days;
-
-    uint256 lastRewardAddedTime;
+    uint256 public constant BALLE_PER_BLOCK = 2283105022831050;
+    uint256 public startRewardBlock;
+    uint256 public lastRewardBlock;
 
     struct VaultReward {
         uint16 multiplier; // multiplicador x 100
@@ -29,8 +27,6 @@ contract VaultRewardPool is Ownable {
     mapping(address => VaultReward) public vaultReward;
     address[] public activeVaults;
     mapping(address => bool) public allVaults;
-
-    event RewardAdded(address vault, uint256 reward);
 
     /**
      * @dev Sets the value of {balle} to the BALLE token that the vault will hold and distribute.
@@ -55,9 +51,9 @@ contract VaultRewardPool is Ownable {
             totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
         }
         totalParts = totalParts + IRewardedVault(_vault).multiplier();
-        if (startTime == 0) {
-            startTime = block.timestamp;
-            endTime = startTime + DURATION;
+        if (startRewardBlock == 0) {
+            startRewardBlock = block.number;
+            lastRewardBlock = block.number;
         }
         activeVaults.push(_vault);
         allVaults[_vault] = true;
@@ -104,15 +100,18 @@ contract VaultRewardPool is Ownable {
 
     function addVaultRewards() public {
         require(activeVaults.length > 0, "!activeVault");
-        require(startTime > 0, "!startTime");
-        uint256 from = lastRewardAddedTime == 0 ? startTime : lastRewardAddedTime;
-        lastRewardAddedTime = block.timestamp;
-        uint256 rewardTime = lastRewardAddedTime.sub(from);
-        uint256 remainingTime = block.timestamp > endTime ? 1 : endTime.sub(from);
-        uint256 reward = balle.balanceOf(address(this)).mul(rewardTime).div(remainingTime);
-        for (uint16 i=0; i<activeVaults.length; i++) {
-            uint256 amount = reward.mul(vaultReward[activeVaults[i]].rewardRate).div(1e18);
-            balle.safeTransfer(activeVaults[i], amount);
+        require(startRewardBlock > 0, "!started");
+        uint256 blocks = uint256(block.number).sub(lastRewardBlock);
+        uint256 reward = blocks.mul(BALLE_PER_BLOCK);
+        if (balle.balanceOf(address(this)) < reward) {
+            reward = balle.balanceOf(address(this));
+        }
+        if (reward > 0) {
+            lastRewardBlock = block.number;
+            for (uint16 i=0; i<activeVaults.length; i++) {
+                uint256 amount = reward.mul(vaultReward[activeVaults[i]].rewardRate).div(1e18);
+                balle.safeTransfer(activeVaults[i], amount);
+            }
         }
     }
 
