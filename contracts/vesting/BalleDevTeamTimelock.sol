@@ -46,7 +46,7 @@ contract BalleDevTeamTimelock {
     /**
      * @notice Transfers tokens held by timelock to beneficiary.
      */
-    function release() public {
+    function release() external {
         // solhint-disable-next-line not-rely-on-time
         require(
             block.timestamp >= releaseTime,

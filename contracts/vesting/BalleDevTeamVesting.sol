@@ -99,7 +99,7 @@ contract BalleDevTeamVesting {
      *    "tokensUnlockedPercentage": "Percent of tokens allowed to be withdrawn."
      * }
      */
-    function getStageAttributes (uint8 index) public view returns (uint256 date, uint256 tokensUnlockedPercentage) {
+    function getStageAttributes (uint8 index) external view returns (uint256 date, uint256 tokensUnlockedPercentage) {
         return (stages[index].date, stages[index].tokensUnlockedPercentage);
     }
 
@@ -123,7 +123,7 @@ contract BalleDevTeamVesting {
     /**
      * @dev Main method for release tokens from vesting.
      */
-    function release () public {
+    function release () external {
         // solhint-disable-next-line not-rely-on-time
         require(
             block.timestamp >= stages[0].date,

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 contract BulkSender {
     using SafeERC20 for IERC20;
 
-    function bulksendToken(IERC20 _token, address[] memory _to, uint256[] memory _values) public {
+    function bulksendToken(IERC20 _token, address[] memory _to, uint256[] memory _values) external {
         require(_to.length == _values.length || _values.length == 1);
 
         if (_values.length == 1) {
