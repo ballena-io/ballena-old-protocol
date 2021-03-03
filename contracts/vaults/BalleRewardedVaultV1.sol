@@ -17,11 +17,6 @@ import "../interfaces/IRewardedVault.sol";
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-/**********************************************
- * TO-DO List:
- *   - Add mecanism to distribute governance token rewards to vault users
- *
- **********************************************/
 contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
     using SafeERC20 for IERC20;
     using Address for address;
@@ -40,6 +35,8 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
     IERC20 public token;
     // The minimum time it has to pass before a strat candidate can be approved.
     uint256 public immutable approvalDelay;
+    // The BALLE token used for rewards.
+    IERC20 public balle;
 
     event NewStratCandidate(address implementation);
     event UpgradeStrat(address implementation);
@@ -54,6 +51,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * @param _name the name of the vault token.
      * @param _symbol the symbol of the vault token.
      * @param _approvalDelay the delay before a new strat can be approved.
+     * @param _balle the BALLE token for rewards.
      * @param _vaultRewardPool the address of the reward pool for the vault.
      * @param _rewardMultiplier the reward multiplier for the vault (100 = x1).
      */
@@ -63,6 +61,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
         string memory _name,
         string memory _symbol,
         uint256 _approvalDelay,
+        address _balle,
         address _vaultRewardPool,
         uint16 _rewardMultiplier
     ) ERC20(
@@ -75,6 +74,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
         token = IERC20(_token);
         strategy = _strategy;
         approvalDelay = _approvalDelay;
+        balle = IERC20(_balle);
     }
 
     /**
@@ -128,7 +128,6 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
             shares = (_amount.mul(totalSupply())).div(_pool);
         }
         _mint(msg.sender, shares);
-        updateShares();
 
         earn();
     }
@@ -154,11 +153,15 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * @dev Function to exit the system. The vault will withdraw the required tokens
      * from the strategy and pay up the token holder. A proportional number of balle
      * tokens are burned in the process.
+     * Additionally, in this rewarded version, it fetches pending rewards from VaultRewardPool
+     * and transfers corresponding reward to user wallet.
      */
     function withdraw(uint256 _shares) public {
+        addVaultRewards();
+
         uint256 r = (balance().mul(_shares)).div(totalSupply());
+        uint256 reward = (balle.balanceOf(address(this)).mul(_shares)).div(totalSupply());
         _burn(msg.sender, _shares);
-        updateShares();
 
         uint b = token.balanceOf(address(this));
         if (b < r) {
@@ -172,6 +175,8 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
         }
 
         token.safeTransfer(msg.sender, r);
+        balle.safeTransfer(msg.sender, reward);
+
     }
 
     /** 
@@ -205,6 +210,14 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
         stratCandidate.proposedTime = 5000000000;
         
         earn();
+    }
+
+    /**
+     * @dev Function for various UIs to display the current BALLE reward per share.
+     * Returns an uint256 with 18 decimals of how much BALLE one vault share represents.
+     */
+    function getRewardPerFullShare() override public view returns (uint256) {
+        return totalSupply() == 0 ? balle.balanceOf(address(this)) : balle.balanceOf(address(this)).mul(1e18).div(totalSupply());
     }
 
 }

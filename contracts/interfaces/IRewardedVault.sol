@@ -24,18 +24,27 @@ abstract contract IRewardedVault is Ownable {
         multiplier = _multiplier;
     }
 
+    /**
+     * @dev Function to activate the vault so it can start to receive rewards from VaultRewardPool.
+     */
     function activateVault() external onlyOwner {
         IVaultRewardPool(vaultRewardPool).activateVault(address(this));
 
         emit ActivateVault();
     }
 
+    /**
+     * @dev Function to retire the vault so it stops receiving rewards from VaultRewardPool.
+     */
     function retireVault() external onlyOwner {
         IVaultRewardPool(vaultRewardPool).retireVault(address(this));
 
         emit RetireVault();
     }
 
+    /**
+     * @dev Function to modify the multiplier of rewards received from VaultRewardPool.
+     */
     function updateMultiplier(uint16 _multiplier) external onlyOwner {
         require(_multiplier <= 10000, "Multiplier too high");
         require(_multiplier > 0, "Multiplier too low");
@@ -45,11 +54,17 @@ abstract contract IRewardedVault is Ownable {
         emit UpdateMultiplier(_multiplier);
     }
 
-    function updateShares() internal {
-        IVaultRewardPool(vaultRewardPool).updateShares(address(this));
-    }
+    /**
+     * @dev Function for various UIs to display the current BALLE reward per share.
+     * Returns an uint256 with 18 decimals of how much BALLE one vault share represents.
+     */
+    function getRewardPerFullShare() virtual public view returns (uint256);
 
-    function getReward() public {
-        IVaultRewardPool(vaultRewardPool).getReward(address(this));
+
+    /**
+     * @dev Function to add pending rewards to vaults.
+     */
+    function addVaultRewards() public {
+        IVaultRewardPool(vaultRewardPool).addVaultRewards();
     }
 }
