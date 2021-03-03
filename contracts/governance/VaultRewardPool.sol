@@ -42,12 +42,13 @@ contract VaultRewardPool is Ownable {
     }
 
     function activateVault(address _vault) external onlyOwner {
+        uint8 numActiveVaults = uint8(activeVaults.length);
         // add pending rewards
-        if (activeVaults.length > 0) {
+        if (numActiveVaults > 0) {
             addVaultRewards();
         }
         uint16 totalParts;
-        for (uint16 i=0; i<activeVaults.length; i++) {
+        for (uint16 i=0; i < numActiveVaults; i++) {
             totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
         }
         totalParts = totalParts + IRewardedVault(_vault).multiplier();
@@ -56,10 +57,11 @@ contract VaultRewardPool is Ownable {
             lastRewardBlock = block.number;
         }
         activeVaults.push(_vault);
+        numActiveVaults++;
         allVaults[_vault] = true;
         vaultReward[_vault].rewardRate = 0;
         vaultReward[_vault].multiplier = IRewardedVault(_vault).multiplier();
-        for (uint16 i=0; i<activeVaults.length; i++) {
+        for (uint16 i=0; i < numActiveVaults; i++) {
             vaultReward[activeVaults[i]].rewardRate = uint256(1e18).mul(vaultReward[activeVaults[i]].multiplier).div(totalParts);
         }
     }
@@ -69,18 +71,20 @@ contract VaultRewardPool is Ownable {
         addVaultRewards();
         uint16 indexToBeDeleted;
         uint16 totalParts = 0;
-        for (uint16 i=0; i<activeVaults.length; i++) {
+        uint8 numActiveVaults = uint8(activeVaults.length);
+        for (uint16 i=0; i < numActiveVaults; i++) {
             if (activeVaults[i] == _vault) {
                 indexToBeDeleted = i;
             } else {
                 totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
             }
         }
-        if (indexToBeDeleted < activeVaults.length-1) {
-            activeVaults[indexToBeDeleted] = activeVaults[activeVaults.length-1];
+        if (indexToBeDeleted < numActiveVaults-1) {
+            activeVaults[indexToBeDeleted] = activeVaults[numActiveVaults-1];
         }
         activeVaults.pop();
-        for (uint16 i=0; i<activeVaults.length; i++) {
+        numActiveVaults--;
+        for (uint16 i=0; i < numActiveVaults; i++) {
             vaultReward[activeVaults[i]].rewardRate = uint256(1e18).mul(vaultReward[activeVaults[i]].multiplier).div(totalParts);
         }
     }
@@ -90,10 +94,11 @@ contract VaultRewardPool is Ownable {
         addVaultRewards();
         vaultReward[_vault].multiplier = IRewardedVault(_vault).multiplier();
         uint16 totalParts;
-        for (uint16 i=0; i<activeVaults.length; i++) {
+        uint8 numActiveVaults = uint8(activeVaults.length);
+        for (uint16 i=0; i < numActiveVaults; i++) {
             totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
         }
-        for (uint16 i=0; i<activeVaults.length; i++) {
+        for (uint16 i=0; i < numActiveVaults; i++) {
             vaultReward[activeVaults[i]].rewardRate = uint256(1e18).mul(vaultReward[activeVaults[i]].multiplier).div(totalParts);
         }
     }
@@ -108,7 +113,8 @@ contract VaultRewardPool is Ownable {
         }
         if (reward > 0) {
             lastRewardBlock = block.number;
-            for (uint16 i=0; i<activeVaults.length; i++) {
+            uint8 numActiveVaults = uint8(activeVaults.length);
+            for (uint16 i=0; i < numActiveVaults; i++) {
                 uint256 amount = reward.mul(vaultReward[activeVaults[i]].rewardRate).div(1e18);
                 balle.safeTransfer(activeVaults[i], amount);
             }
