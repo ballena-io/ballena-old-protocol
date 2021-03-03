@@ -45,8 +45,11 @@ contract BalleDevTeamVesting {
         uint256 tokensUnlockedPercentage;
     }
 
+    // Num of stages
+    uint8 public constant NUM_STAGES = 5;
+
     // Array for storing all vesting stages with structure defined above
-    VestingStage[5] public stages;
+    VestingStage[NUM_STAGES] public stages;
 
     // Total amount of tokens sent
     uint256 public initialTokensBalance;
@@ -174,7 +177,7 @@ contract BalleDevTeamVesting {
     function getTokensUnlockedPercentage () private view returns (uint256) {
         uint256 allowedPercent;
         
-        for (uint8 i = 0; i < stages.length; i++) {
+        for (uint8 i = 0; i < NUM_STAGES; i++) {
             if (block.timestamp >= stages[i].date) {
                 allowedPercent = stages[i].tokensUnlockedPercentage;
             }
