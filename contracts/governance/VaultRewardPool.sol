@@ -116,6 +116,9 @@ contract VaultRewardPool is Ownable {
             uint8 numActiveVaults = uint8(activeVaults.length);
             for (uint16 i=0; i < numActiveVaults; i++) {
                 uint256 amount = reward.mul(vaultReward[activeVaults[i]].rewardRate).div(1e18);
+                if (balle.balanceOf(address(this)) < amount) {
+                    amount = balle.balanceOf(address(this));
+                }
                 balle.safeTransfer(activeVaults[i], amount);
             }
         }
