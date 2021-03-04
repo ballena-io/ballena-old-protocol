@@ -10,7 +10,7 @@ contract LPTokenWrapper {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    IERC20 public balle;
+    IERC20 public immutable balle;
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;

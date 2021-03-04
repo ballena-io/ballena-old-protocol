@@ -32,11 +32,11 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
     // The strategy currently in use by the vault.
     address public strategy;
     // The token the vault accepts and looks to maximize.
-    IERC20 public token;
+    IERC20 public immutable token;
     // The minimum time it has to pass before a strat candidate can be approved.
     uint256 public immutable approvalDelay;
     // The BALLE token used for rewards.
-    IERC20 public balle;
+    IERC20 public immutable balle;
 
     event NewStratCandidate(address implementation);
     event UpgradeStrat(address implementation);

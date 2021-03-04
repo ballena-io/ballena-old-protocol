@@ -15,7 +15,7 @@ contract VaultRewardPool is Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    IERC20 public balle;
+    IERC20 public immutable balle;
     uint256 public constant BALLE_PER_BLOCK = 2283105022831050;
     uint256 public startRewardBlock;
     uint256 public lastRewardBlock;

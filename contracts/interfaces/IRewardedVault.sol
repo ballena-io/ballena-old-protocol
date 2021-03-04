@@ -7,8 +7,7 @@ import "../interfaces/IVaultRewardPool.sol";
 
 abstract contract IRewardedVault is Ownable {
     uint16 public multiplier;
-    address vaultRewardPool;
-    bool public active;
+    address public immutable vaultRewardPool;
 
     event ActivateVault();
     event RetireVault();

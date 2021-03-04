@@ -21,7 +21,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    IERC20 public wbnb;
+    IERC20 public immutable wbnb;
     uint256 public constant DURATION = 1 days;
 
     uint16 public multiplier = 1;
@@ -32,7 +32,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
-    address public treasury;
+    address public immutable treasury;
 
     /**
      * @dev Reward Fee paid to treasury.
@@ -122,7 +122,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
             rewards[msg.sender] = 0;
             uint256 rewardFee = reward.mul(REWARD_FEE).div(REWARD_MAX);
             IERC20(balle).safeTransfer(treasury, rewardFee);
-            balle.safeTransfer(msg.sender, reward.sub(rewardFee));
+            IERC20(balle).safeTransfer(msg.sender, reward.sub(rewardFee));
             emit RewardPaid(msg.sender, reward);
         }
     }
