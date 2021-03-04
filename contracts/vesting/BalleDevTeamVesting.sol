@@ -34,10 +34,10 @@ contract BalleDevTeamVesting {
     using SafeMath for uint256;
 
     // Address of BALLE token
-    IERC20 public balle;
+    IERC20 public immutable balle;
 
     // Address for receiving tokens
-    address public destinationAddress;
+    address public immutable destinationAddress;
 
     // Tokens vesting stage structure with vesting date and tokens allowed to unlock
     struct VestingStage {
