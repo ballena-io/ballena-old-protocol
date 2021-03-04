@@ -40,6 +40,10 @@ contract LPTokenWrapper {
     function withdraw(uint256 amount) virtual public {
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
+        if (balle.balanceOf(address(this)) < amount) {
+            // just in case rounding
+            amount = balle.balanceOf(address(this));
+        }
         balle.safeTransfer(msg.sender, amount);
     }
 }

@@ -120,8 +120,13 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         if (reward > 0) {
             rewards[msg.sender] = 0;
             uint256 rewardFee = reward.mul(REWARD_FEE).div(REWARD_MAX);
-            IERC20(balle).safeTransfer(treasury, rewardFee);
-            IERC20(balle).safeTransfer(msg.sender, reward.sub(rewardFee));
+            balle.safeTransfer(treasury, rewardFee);
+            uint256 amount = reward.sub(rewardFee);
+            if (balle.balanceOf(address(this)) < totalSupply().add(amount)) {
+                // just in case rounding
+                amount = balle.balanceOf(address(this)).sub(totalSupply());
+            }
+            balle.safeTransfer(msg.sender, amount);
             emit RewardPaid(msg.sender, reward);
         }
     }
