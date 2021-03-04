@@ -11,13 +11,14 @@ contract BulkSender {
     function bulksendToken(IERC20 _token, address[] memory _to, uint256[] memory _values) external {
         require(_to.length == _values.length || _values.length == 1);
 
+        uint16 qty = uint16(_to.length);
         if (_values.length == 1) {
             uint256 value = _values[0];
-            for (uint256 i = 0; i < _to.length; i++) {
+            for (uint256 i = 0; i < qty; i++) {
                 _token.transferFrom(msg.sender, _to[i], value);
             }
         } else {
-            for (uint256 i = 0; i < _to.length; i++) {
+            for (uint256 i = 0; i < qty; i++) {
                 _token.transferFrom(msg.sender, _to[i], _values[i]);
             }
         }
