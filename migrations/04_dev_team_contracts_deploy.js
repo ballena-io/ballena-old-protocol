@@ -1,45 +1,49 @@
 const fs = require('fs');
 
-const BALLE = artifacts.require("BALLE");
-const BalleDevTeamVesting = artifacts.require("BalleDevTeamVesting");
-const BalleDevTeamTimelock = artifacts.require("BalleDevTeamTimelock");
+const BalleDevTeamVesting = artifacts.require('BalleDevTeamVesting');
+const BalleDevTeamTimelock = artifacts.require('BalleDevTeamTimelock');
 
 module.exports = async function (deployer, network, accounts) {
   // Load network config data
   const networkConfigFilename = `.env.${network}.json`;
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
 
-  // Set external addresses
-  var devTeamAddress;
-  var internalAddress;
-  var internalReleaseTime;
-  if (network == "development") {
+  // Get addresses
+  let devTeamAddress;
+  let internalAddress;
+  let internalReleaseTime;
+  if (network == 'development') {
     devTeamAddress = accounts;
     internalAddress = accounts[1];
     internalReleaseTime = Math.round((new Date()).getTime() / 1000) + 300; // 5 mins. from now
-    console.log("TIME: ", internalReleaseTime);
+    console.log('DEV TIME: ', internalReleaseTime);
   } else {
     // load from network config
     devTeamAddress = networkConfig.devTeamAddress;
     internalAddress = networkConfig.internalAddress;
     internalReleaseTime = networkConfig.internalReleaseTime;
   }
+  const balleAddress = networkConfig.BALLE;
 
-  const balle = await BALLE.deployed();
-  const balleAddress = balle.address;
-
-  var devTeamVestingAddress = new Array();
+  let devTeamVestingAddress = new Array();
+  let devTeamVesting;
   // Deploy 6 instances of BalleDevTeamVesting contract
-  for (i=0;i<6;i++) {
-    var devTeamVesting = await deployer.new(BalleDevTeamVesting, balleAddress, devTeamAddress[i]);
+  if (network == 'development') {
+    // inexplicablemente, la primera creación devuelve 'undefined'
+    devTeamVesting = await deployer.new(BalleDevTeamVesting, balleAddress, devTeamAddress[0]);
+    console.log(devTeamVesting === undefined ? "UNDEFINED!!??" : "OK");
+  }
+  for (i=0; i < 6; i++) {
+    devTeamVesting = await deployer.new(BalleDevTeamVesting, balleAddress, devTeamAddress[i]);
     devTeamVestingAddress[i] = devTeamVesting.address;
   }
-  networkConfig["devTeamVestingAddress"] = devTeamVestingAddress;
+  networkConfig['devTeamVestingAddress'] = devTeamVestingAddress;
 
   // Deploy BalleDevTeamTimelock contract
   await deployer.deploy(BalleDevTeamTimelock, balleAddress, internalAddress, internalReleaseTime);
   const devTeamTimelock = await BalleDevTeamTimelock.deployed();
-  networkConfig["devTeamTimelockAddress"] = devTeamTimelock.address;
+  networkConfig['devTeamTimelockAddress'] = devTeamTimelock.address;
+  networkConfig['internalReleaseTime'] = internalReleaseTime;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 
