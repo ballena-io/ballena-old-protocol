@@ -291,7 +291,7 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
     /**
      * @dev Pauses deposits. Withdraws all funds from the MasterChef, leaving rewards behind
      */
-    function panic() public onlyOwner {
+    function panic() external onlyOwner {
         pause();
         IMasterChef(masterchef).emergencyWithdraw(poolId);
     }

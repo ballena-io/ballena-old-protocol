@@ -19,20 +19,24 @@ contract LPTokenWrapper {
         balle = IERC20(_balle);
     }
 
+    // totalSupply visibility is public as it's meant to be called from derived contract
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
 
+    // balanceOf visibility is public as it's meant to be called from derived contract
     function balanceOf(address account) public view returns (uint256) {
         return _balances[account];
     }
 
+    // stake visibility is public as it's meant to be called from derived contract
     function stake(uint256 amount) virtual public {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
         balle.safeTransferFrom(msg.sender, address(this), amount);
     }
 
+    // withdraw visibility is public as it's meant to be called from derived contract
     function withdraw(uint256 amount) virtual public {
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);

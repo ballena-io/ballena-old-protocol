@@ -57,7 +57,7 @@ abstract contract IRewardedVault is Ownable {
      * @dev Function for various UIs to display the current BALLE reward per share.
      * Returns an uint256 with 18 decimals of how much BALLE one vault share represents.
      */
-    function getRewardPerFullShare() virtual public view returns (uint256);
+    function getRewardPerFullShare() virtual external view returns (uint256);
 
 
     /**

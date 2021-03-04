@@ -100,7 +100,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * @dev Function for various UIs to display the current value of one of our yield tokens.
      * Returns an uint256 with 18 decimals of how much underlying asset one vault share represents.
      */
-    function getPricePerFullShare() public view returns (uint256) {
+    function getPricePerFullShare() external view returns (uint256) {
         return totalSupply() == 0 ? 1e18 : balance().mul(1e18).div(totalSupply());
     }
 
@@ -183,7 +183,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * @dev Sets the candidate for the new strat to use with this vault.
      * @param _implementation The address of the candidate strategy.  
      */
-    function proposeStrat(address _implementation) public onlyOwner {
+    function proposeStrat(address _implementation) external onlyOwner {
         stratCandidate = StratCandidate({ 
             implementation: _implementation,
             proposedTime: block.timestamp
@@ -198,7 +198,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * happening in +100 years for safety. 
      */
 
-    function upgradeStrat() public onlyOwner {
+    function upgradeStrat() external onlyOwner {
         require(stratCandidate.implementation != address(0), "There is no candidate");
         require(stratCandidate.proposedTime.add(approvalDelay) < block.timestamp, "Delay has not passed");
         
@@ -216,7 +216,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * @dev Function for various UIs to display the current BALLE reward per share.
      * Returns an uint256 with 18 decimals of how much BALLE one vault share represents.
      */
-    function getRewardPerFullShare() override public view returns (uint256) {
+    function getRewardPerFullShare() override external view returns (uint256) {
         return totalSupply() == 0 ? balle.balanceOf(address(this)) : balle.balanceOf(address(this)).mul(1e18).div(totalSupply());
     }
 
