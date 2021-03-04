@@ -3,6 +3,7 @@ const fs = require('fs');
 const BalleTreasury = artifacts.require('BalleTreasury');
 const RewardPool = artifacts.require('RewardPool');
 const VaultRewardPool = artifacts.require('VaultRewardPool');
+const BulkSender = artifacts.require('BulkSender');
 
 module.exports = async function (deployer, network, accounts) {
   // Load network config data
@@ -26,9 +27,14 @@ module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(VaultRewardPool, balleAddress);
   const vaultRewardPool = await VaultRewardPool.deployed();
 
+  // Deploy BulkSender contract
+  await deployer.deploy(BulkSender, balleAddress);
+  const bulkSender = await BulkSender.deployed();
+
   networkConfig['treasuryAddress'] = treasury.address;
   networkConfig['rewardPoolAddress'] = rewardPool.address;
   networkConfig['vaultRewardPoolAddress'] = vaultRewardPool.address;
+  networkConfig['bulkSenderAddress'] = bulkSender.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

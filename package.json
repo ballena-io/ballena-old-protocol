@@ -7,6 +7,7 @@
     "generate-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
     "compile": "rimraf build/contracts && npx truffle compile && yarn generate-types",
     "migrate": "npx truffle migrate --network development",
+    "console": "npx truffle console --network development",
     "postinstall": "yarn compile",
     "test": "npx truffle test"
   },

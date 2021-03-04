@@ -3,7 +3,7 @@
 pragma solidity 0.7.4;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../interfaces/IPancakePair.sol";
+import "./IPancakePair00.sol";
 import "./IPancakeCallee.sol";
 import "./PancakeERC20.sol";
 
@@ -27,7 +27,7 @@ library Math1 {
     }
 }
 
-contract PancakePair is IPancakePair, PancakeERC20 {
+contract PancakePair is IPancakePair00, PancakeERC20 {
     using SafeMath  for uint;
     using UQ112x112 for uint224;
 
@@ -129,7 +129,7 @@ contract PancakePair is IPancakePair, PancakeERC20 {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function mint(address to) external lock returns (uint liquidity) {
+    function mint(address to) external override lock returns (uint liquidity) {
         (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
         uint balance0 = IERC20(token0).balanceOf(address(this));
         uint balance1 = IERC20(token1).balanceOf(address(this));

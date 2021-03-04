@@ -35,6 +35,7 @@ module.exports = async function (deployer, network, accounts) {
   }
   for (i=0; i < 6; i++) {
     devTeamVesting = await deployer.new(BalleDevTeamVesting, balleAddress, devTeamAddress[i]);
+    console.log(devTeamVesting === undefined ? "UNDEFINED!!??" : "OK");
     devTeamVestingAddress[i] = devTeamVesting.address;
   }
   networkConfig['devTeamVestingAddress'] = devTeamVestingAddress;

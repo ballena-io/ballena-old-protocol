@@ -1,8 +1,6 @@
 const fs = require('fs');
 
 const BALLE = artifacts.require('BALLE');
-const RewardPool = artifacts.require('RewardPool');
-const VaultRewardPool = artifacts.require('VaultRewardPool');
 
 module.exports = async function (deployer, network, accounts) {
   // Load network config data

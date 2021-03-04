@@ -208,6 +208,8 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
         addLiquidity();
         deposit();
 
+        // TODO: consider adding here IVaultRewardPool.addVaultRewards()
+
         emit StratHarvest(msg.sender);
     }
 
