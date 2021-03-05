@@ -9,9 +9,8 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy BulkSender contract
   await deployer.deploy(BulkSender);
-  const bulkSender = await BulkSender.deployed();
 
-  networkConfig['bulkSenderAddress'] = bulkSender.address;
+  networkConfig['bulkSenderAddress'] = BulkSender.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

@@ -14,9 +14,8 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy RewardPool contract
   await deployer.deploy(RewardPool, wbnbAddress, balleAddress, treasuryAddress);
-  const rewardPool = await RewardPool.deployed();
 
-  networkConfig['rewardPoolAddress'] = rewardPool.address;
+  networkConfig['rewardPoolAddress'] = RewardPool.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

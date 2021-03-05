@@ -151,14 +151,10 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
 
     /**
      * @dev Function to exit the system. The vault will withdraw the required tokens
-     * from the strategy and pay up the token holder. A proportional number of balle
+     * from the strategy and pay up the token holder. A proportional number of balleVAULT
      * tokens are burned in the process.
-     * Additionally, in this rewarded version, it fetches pending rewards from VaultRewardPool
-     * and transfers corresponding reward to user wallet.
      */
     function withdraw(uint256 _shares) public {
-        addVaultRewards();
-
         uint256 r = (balance().mul(_shares)).div(totalSupply());
         uint256 bb = balle.balanceOf(address(this));
         uint256 reward = (bb.mul(_shares)).div(totalSupply());

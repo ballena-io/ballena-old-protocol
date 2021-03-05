@@ -9,9 +9,8 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy Treasury contract
   await deployer.deploy(BalleTreasury);
-  const treasury = await BalleTreasury.deployed();
 
-  networkConfig['treasuryAddress'] = treasury.address;
+  networkConfig['treasuryAddress'] = BalleTreasury.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

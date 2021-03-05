@@ -8,8 +8,7 @@ module.exports = async function (deployer, network, accounts) {
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
 
   await deployer.deploy(Migrations);
-  const migrations = await Migrations.deployed();
-  networkConfig['migrationsAddress'] = migrations.address;
+  networkConfig['migrationsAddress'] = Migrations.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

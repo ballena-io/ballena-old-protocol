@@ -14,7 +14,6 @@ import "../interfaces/IPancakeRouter.sol";
 import "../interfaces/IPancakePair.sol";
 import "../interfaces/IMasterChef.sol";
 import "../interfaces/IRewardedVault.sol";
-import "../interfaces/IActionable.sol";
 
 /**
  * @dev Implementation of a strategy to get yields from farming LP Pools in PancakeSwap.
@@ -27,7 +26,7 @@ import "../interfaces/IActionable.sol";
  * 
  * This strat is currently compatible with all LP pools.
  */
-contract CakeLPStrategyV1 is Ownable, Pausable, IActionable {
+contract CakeLPStrategyV1 is Ownable, Pausable {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
@@ -200,7 +199,7 @@ contract CakeLPStrategyV1 is Ownable, Pausable, IActionable {
      * 4. Adds more liquidity to the pool.
      * 5. It deposits the new LP tokens.
      */
-    function harvest() external whenNotPaused onlyActionAllowed {
+    function harvest() external whenNotPaused {
         IMasterChef(masterchef).deposit(poolId, 0);
         chargeFees();
         addLiquidity();

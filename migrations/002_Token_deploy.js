@@ -11,11 +11,9 @@ module.exports = async function (deployer, network, accounts) {
   let balleToken;
   if (network == 'bsc_mainnet') {
     await deployer.deploy(BALLE, 'ballena.io', 'BALLE');
-    balleToken = await BALLE.deployed();
 
   } else {
     await deployer.deploy(BALLE, 'bproject.io', 'BTEST');
-    balleToken = await BALLE.deployed();
 
     if (network == 'development') {
       // deploy mock token contracts
@@ -24,7 +22,7 @@ module.exports = async function (deployer, network, accounts) {
       networkConfig['WBNB'] = wbnb.address;
     }
   } 
-  networkConfig['BALLE'] = balleToken.address;
+  networkConfig['BALLE'] = BALLE.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

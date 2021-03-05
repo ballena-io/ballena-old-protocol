@@ -12,9 +12,8 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy VaultRewardPool contract
   await deployer.deploy(VaultRewardPool, balleAddress);
-  const vaultRewardPool = await VaultRewardPool.deployed();
 
-  networkConfig['vaultRewardPoolAddress'] = vaultRewardPool.address;
+  networkConfig['vaultRewardPoolAddress'] = VaultRewardPool.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

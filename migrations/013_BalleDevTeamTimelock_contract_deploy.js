@@ -23,8 +23,8 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy BalleDevTeamTimelock contract
   await deployer.deploy(BalleDevTeamTimelock, balleAddress, internalAddress, internalReleaseTime);
-  const devTeamTimelock = await BalleDevTeamTimelock.deployed();
-  networkConfig['devTeamTimelockAddress'] = devTeamTimelock.address;
+  
+  networkConfig['devTeamTimelockAddress'] = BalleDevTeamTimelock.address;
   networkConfig['internalReleaseTime'] = internalReleaseTime;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
