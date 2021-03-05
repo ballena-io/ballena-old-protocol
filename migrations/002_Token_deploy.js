@@ -16,7 +16,6 @@ module.exports = async function (deployer, network, accounts) {
   } else {
     await deployer.deploy(BALLE, 'bproject.io', 'BTEST');
     balleToken = await BALLE.deployed();
-    await balleToken.addMinter(accounts[0]);
 
     if (network == 'development') {
       // deploy mock token contracts

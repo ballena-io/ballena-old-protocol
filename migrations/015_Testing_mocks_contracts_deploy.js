@@ -10,21 +10,35 @@ module.exports = async function (deployer, network, accounts) {
   const networkConfigFilename = `.env.${network}.json`;
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
 
-  if (network == 'bsc_mainnet') {
-  } else {
+  if (network != 'bsc_mainnet') {
     let cake = await deployer.new(ERC20Token, 'PancakeSwap Cake', 'CAKE');
-    console.log(cake === undefined ? "UNDEFINED!!??" : "OK");
+    console.log(cake === undefined ? 'UNDEFINED!!??' : `OK ${cake.address}`);
     // de nuevo lo mismo, el primer deployer.new(...) devuelve undefined!!
     if (cake === undefined) {
       cake = await deployer.new(ERC20Token, 'PancakeSwap Cake', 'CAKE');
-      console.log(cake === undefined ? "UNDEFINED!!??" : "OK");
+      console.log(cake === undefined ? 'UNDEFINED!!??' : `OK ${cake.address}`);
     }
+
     let syrup = await deployer.new(ERC20Token, 'PancakeSwap Syrup', 'SYRUP');
-    console.log(syrup === undefined ? "UNDEFINED!!??" : "OK");
+    console.log(syrup === undefined ? 'UNDEFINED!!??' : `OK ${syrup.address}`);
+    if (syrup === undefined) {
+      syrup = await deployer.new(ERC20Token, 'PancakeSwap Syrup', 'SYRUP');
+      console.log(syrup === undefined ? 'UNDEFINED!!??' : `OK ${syrup.address}`);
+    }
+
     let tokenA = await deployer.new(ERC20Token, 'bALBT', 'BALBT');
-    console.log(tokenA === undefined ? "UNDEFINED!!??" : "OK");
+    console.log(tokenA === undefined ? 'UNDEFINED!!??' : `OK ${tokenA.address}`);
+    if (tokenA === undefined) {
+      tokenA = await deployer.new(ERC20Token, 'bALBT', 'BALBT');
+      console.log(tokenA === undefined ? 'UNDEFINED!!??' : `OK ${tokenA.address}`);
+    }
+
     let tokenB = await deployer.new(ERC20Token, 'BNB', 'BNB');
-    console.log(tokenB === undefined ? "UNDEFINED!!??" : "OK");
+    console.log(tokenB === undefined ? 'UNDEFINED!!??' : `OK ${tokenB.address}`);
+    if(tokenB === undefined){
+      tokenB = await deployer.new(ERC20Token, 'BNB', 'BNB');
+      console.log(tokenB === undefined ? 'UNDEFINED!!??' : `OK ${tokenB.address}`);
+    }
     
     await deployer.deploy(PancakePair);
     pair = await PancakePair.deployed();

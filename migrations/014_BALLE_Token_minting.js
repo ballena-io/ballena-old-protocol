@@ -14,17 +14,16 @@ module.exports = async function (deployer, network, accounts) {
   const devTeamVestingAddress = networkConfig.devTeamVestingAddress;
   const devTeamTimelockAddress = networkConfig.devTeamTimelockAddress;
 
-  if (network == 'bsc_mainnet') {
-  } else {
-    const balleToken = await BALLE.at(balleAddress);
+  const balleToken = await BALLE.at(balleAddress);
 
-    await balleToken.mint(rewardPoolAddress, 13000)
-    await balleToken.mint(vaultRewardPoolAddress, 24000)
+  await balleToken.addMinter(accounts[0]);
 
-    for (i=0; i < devTeamVestingAddress.length - 1; i++) {
-      await balleToken.mint(devTeamVestingAddress[i], 400)
-    }
-    await balleToken.mint(devTeamTimelockAddress, 600)
+  await balleToken.mint(rewardPoolAddress, 13000)
+  await balleToken.mint(vaultRewardPoolAddress, 24000)
+
+  for (i=0; i < devTeamVestingAddress.length - 1; i++) {
+    await balleToken.mint(devTeamVestingAddress[i], 400)
   }
+  await balleToken.mint(devTeamTimelockAddress, 600)
 
 };
