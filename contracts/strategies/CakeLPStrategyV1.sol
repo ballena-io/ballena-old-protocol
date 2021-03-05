@@ -14,6 +14,7 @@ import "../interfaces/IPancakeRouter.sol";
 import "../interfaces/IPancakePair.sol";
 import "../interfaces/IMasterChef.sol";
 import "../interfaces/IRewardedVault.sol";
+import "../interfaces/IActionable.sol";
 
 /**
  * @dev Implementation of a strategy to get yields from farming LP Pools in PancakeSwap.
@@ -26,7 +27,7 @@ import "../interfaces/IRewardedVault.sol";
  * 
  * This strat is currently compatible with all LP pools.
  */
-contract CakeLPStrategyV1 is Ownable, Pausable {
+contract CakeLPStrategyV1 is Ownable, Pausable, IActionable {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
@@ -71,16 +72,14 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      * Current implementation separates 4.5% for fees.
      *
      * {REWARDS_FEE} - 3% goes to BALLE holders through the {rewards} pool.
-     * {CALL_FEE} - 0.5% goes to whoever executes the harvest function as gas subsidy.
-     * {TREASURY_FEE} - 0.5% goes to the treasury.
+     * {TREASURY_FEE} - 1% goes to the treasury.
      * {MAX_FEE} - Aux const used to safely calc the correct amounts.
      *
      * {WITHDRAWAL_FEE} - Fee taxed when a user withdraws funds. 10 === 0.1% fee.
      * {WITHDRAWAL_MAX} - Aux const used to safely calc the correct amounts.
      */
-    uint constant public REWARDS_FEE  = 776;
-    uint constant public CALL_FEE     = 112;
-    uint constant public TREASURY_FEE = 112;
+    uint constant public REWARDS_FEE  = 750;
+    uint constant public TREASURY_FEE = 250;
     uint constant public MAX_FEE      = 1000;
 
     uint constant public WITHDRAWAL_FEE = 10;
@@ -201,22 +200,18 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      * 4. Adds more liquidity to the pool.
      * 5. It deposits the new LP tokens.
      */
-    function harvest() external whenNotPaused {
-        require(!Address.isContract(msg.sender), "!contract");
+    function harvest() external whenNotPaused onlyActionAllowed {
         IMasterChef(masterchef).deposit(poolId, 0);
         chargeFees();
         addLiquidity();
         deposit();
-
-        // TODO: consider adding here IVaultRewardPool.addVaultRewards()
 
         emit StratHarvest(msg.sender);
     }
 
     /**
      * @dev Takes out 4.0% as system fees from the rewards. 
-     * 0.5% -> Call Fee
-     * 0.5% -> Treasury fee
+     * 1.0% -> Treasury fee
      * 3.0% -> BALLE Holders
      */
     function chargeFees() internal {
@@ -224,9 +219,6 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
         IPancakeRouter(unirouter).swapExactTokensForTokens(toWbnb, 0, cakeToWbnbRoute, address(this), block.timestamp.add(600));
         
         uint256 wbnbBal = IERC20(wbnb).balanceOf(address(this));
-
-        uint256 callFee = wbnbBal.mul(CALL_FEE).div(MAX_FEE);
-        IERC20(wbnb).safeTransfer(msg.sender, callFee);
 
         uint256 treasuryFee = wbnbBal.mul(TREASURY_FEE).div(MAX_FEE);
         IERC20(wbnb).safeTransfer(treasury, treasuryFee);
