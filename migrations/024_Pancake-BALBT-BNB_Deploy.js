@@ -13,7 +13,7 @@ module.exports = async function (deployer, network, accounts) {
   // Get addresses
   const pancakePairAddress = networkConfig.PancakePairAddress;
   const pancakeRouterAddress = networkConfig.PancakeRouterAddress;
-  const masterchefAddress = networkConfig.MasterchefAddress;
+  const masterChefAddress = networkConfig.MasterChefAddress;
   const vaultRewardPoolAddress = networkConfig.vaultRewardPoolAddress;
   const treasuryAddress = networkConfig.treasuryAddress;
   const rewardPoolAddress = networkConfig.rewardPoolAddress;
@@ -36,7 +36,7 @@ module.exports = async function (deployer, network, accounts) {
   txRegistry.push(ballePancakeBALBT_BNB.transactionHash);
 
   let stratPancakeBALBT_BNB = await deployer.new(CakeLPStrategyV1,
-    wbnb, balle, cake, pancakeRouterAddress, masterchefAddress,
+    wbnb, balle, cake, pancakeRouterAddress, masterChefAddress,
     pancakePairAddress, 103, rewardPoolAddress, treasuryAddress,
     ballePancakeBALBT_BNB.address
   );

@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const Masterchef = artifacts.require('Masterchef');
+const MasterChef = artifacts.require('MasterChef');
 
 module.exports = async function (deployer, network, accounts) {
   // Load network config data
@@ -15,11 +15,11 @@ module.exports = async function (deployer, network, accounts) {
 
     let block = await web3.eth.getBlock("latest")
 
-    await deployer.deploy(Masterchef, cake, syrup, devAddress, '1000000000000000000', block.number);
-    txRegistry.push(Masterchef.transactionHash);
+    await deployer.deploy(MasterChef, cake, syrup, devAddress, '1000000000000000000', block.number);
+    txRegistry.push(MasterChef.transactionHash);
 
     networkConfig['txRegistry'] = txRegistry;
-    networkConfig['MasterchefAddress'] = Masterchef.address;
+    networkConfig['MasterChefAddress'] = MasterChef.address;
 
     fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
   } 

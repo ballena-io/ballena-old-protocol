@@ -10,25 +10,14 @@ module.exports = async function (deployer, network, accounts) {
 
   // Get addresses
   const balleAddress = networkConfig.BALLE;
-  const rewardPoolAddress = networkConfig.rewardPoolAddress;
-  const vaultRewardPoolAddress = networkConfig.vaultRewardPoolAddress;
-  const devTeamTimelockAddress = networkConfig.devTeamTimelockAddress;
 
   const balleToken = await BALLE.at(balleAddress);
 
-  let result = await balleToken.addMinter(accounts[0]);
+  let result = await balleToken.removeMinter(accounts[0]);
   console.log(`TX: ${result.tx}`);
   txRegistry.push(result.tx);
 
-  result = await balleToken.mint(rewardPoolAddress, 13000)
-  console.log(`TX: ${result.tx}`);
-  txRegistry.push(result.tx);
-
-  result = await balleToken.mint(vaultRewardPoolAddress, 24000)
-  console.log(`TX: ${result.tx}`);
-  txRegistry.push(result.tx);
-
-  result = await balleToken.mint(devTeamTimelockAddress, 600)
+  result = await balleToken.setGovernance("0x0000000000000000000000000000000000000000")
   console.log(`TX: ${result.tx}`);
   txRegistry.push(result.tx);
 
