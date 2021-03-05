@@ -27,7 +27,11 @@ module.exports = async function (deployer, network, accounts) {
     console.log(devTeamVesting === undefined ? 'UNDEFINED!!??' : `OK ${devTeamVesting.address}`);
   }
 
-  networkConfig['devTeamVestingAddress'][NUMBER] = devTeamVesting.address;
+  if (networkConfig['devTeamVestingAddress'] === undefined) {
+    networkConfig['devTeamVestingAddress'] = [devTeamVesting.address];
+  } else {
+    networkConfig['devTeamVestingAddress'][NUMBER] = devTeamVesting.address;
+  }
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 

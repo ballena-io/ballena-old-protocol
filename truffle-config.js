@@ -53,14 +53,14 @@ module.exports = {
       provider: () => new HDWalletProvider(bscTestnetConfig.wallets, "https://data-seed-prebsc-1-s1.binance.org:8545/", 0, 2),
       network_id: 97,
       confirmations: 5,
-      timeoutBlocks: 1000,
+      timeoutBlocks: 30000,
       skipDryRun: true
     },
     bsc_mainnet: {
       provider: () => new HDWalletProvider(bscMainnetConfig.wallets, "https://bsc-dataseed.binance.org/", 0, 2),
       network_id: 56,
       confirmations: 10,
-      timeoutBlocks: 500,
+      timeoutBlocks: 1000,
       skipDryRun: true
     },
   },
