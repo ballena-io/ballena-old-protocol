@@ -107,7 +107,7 @@ contract BalleDevTeamVesting {
      * @dev Setup array with vesting stages dates and percents.
      */
     function initVestingStages () internal {
-        stages[0].date = 1614614400;
+        stages[0].date = 1614960000;
         stages[1].date = 1622563200;
         stages[2].date = 1630512000;
         stages[3].date = 1638374400;

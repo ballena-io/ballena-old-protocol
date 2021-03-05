@@ -6,16 +6,23 @@ module.exports = async function (deployer, network, accounts) {
   // Load network config data
   const networkConfigFilename = `.env.${network}.json`;
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
+  let txRegistry = networkConfig.txRegistry;
 
   if (network != 'bsc_mainnet') {
     const tokenA = networkConfig.TokenA;
     const tokenB = networkConfig.TokenB;
     
     await deployer.deploy(PancakePair);
-    pair = await PancakePair.deployed();
-    await pair.initialize(tokenA, tokenB);
+    txRegistry.push(PancakePair.transactionHash);
+
+    let pancakePair = await PancakePair.deployed();
+
+    let result = await pancakePair.initialize(tokenA, tokenB);
+    console.log(`TX: ${result.tx}`);
+    txRegistry.push(result.tx);
     
-    networkConfig['PancakePairAddress'] = pair.address;
+    networkConfig['txRegistry'] = txRegistry;
+    networkConfig['PancakePairAddress'] = pancakePair.address;
 
     fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
   } 

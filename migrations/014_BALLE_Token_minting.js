@@ -6,6 +6,7 @@ module.exports = async function (deployer, network, accounts) {
   // Load network config data
   const networkConfigFilename = `.env.${network}.json`;
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
+  let txRegistry = networkConfig.txRegistry;
 
   // Get addresses
   const balleAddress = networkConfig.BALLE;
@@ -16,14 +17,30 @@ module.exports = async function (deployer, network, accounts) {
 
   const balleToken = await BALLE.at(balleAddress);
 
-  await balleToken.addMinter(accounts[0]);
+  let result = await balleToken.addMinter(accounts[0]);
+  console.log(`TX: ${result.tx}`);
+  txRegistry.push(result.tx);
 
-  await balleToken.mint(rewardPoolAddress, 13000)
-  await balleToken.mint(vaultRewardPoolAddress, 24000)
+  result = await balleToken.mint(rewardPoolAddress, 13000)
+  console.log(`TX: ${result.tx}`);
+  txRegistry.push(result.tx);
+
+  result = await balleToken.mint(vaultRewardPoolAddress, 24000)
+  console.log(`TX: ${result.tx}`);
+  txRegistry.push(result.tx);
 
   for (i=0; i < devTeamVestingAddress.length - 1; i++) {
-    await balleToken.mint(devTeamVestingAddress[i], 400)
+    result = await balleToken.mint(devTeamVestingAddress[i], 400)
+    console.log(`TX: ${result.tx}`);
+    txRegistry.push(result.tx);
   }
-  await balleToken.mint(devTeamTimelockAddress, 600)
+  
+  result = await balleToken.mint(devTeamTimelockAddress, 600)
+  console.log(`TX: ${result.tx}`);
+  txRegistry.push(result.tx);
+
+  networkConfig['txRegistry'] = txRegistry;
+
+  fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
 
 };

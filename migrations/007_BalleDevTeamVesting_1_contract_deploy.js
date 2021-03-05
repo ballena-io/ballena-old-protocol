@@ -6,6 +6,7 @@ module.exports = async function (deployer, network, accounts) {
   // Load network config data
   const networkConfigFilename = `.env.${network}.json`;
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
+  let txRegistry = networkConfig.txRegistry;
 
   // Get addresses
   let devTeamAddress;
@@ -26,7 +27,10 @@ module.exports = async function (deployer, network, accounts) {
     devTeamVesting = await deployer.new(BalleDevTeamVesting, balleAddress, devTeamAddress[NUMBER]);
     console.log(devTeamVesting === undefined ? 'UNDEFINED!!??' : `OK ${devTeamVesting.address}`);
   }
+  console.log(`TX: ${devTeamVesting.transactionHash}`);
+  txRegistry.push(devTeamVesting.transactionHash);
 
+  networkConfig['txRegistry'] = txRegistry;
   if (networkConfig['devTeamVestingAddress'] === undefined) {
     networkConfig['devTeamVestingAddress'] = [devTeamVesting.address];
   } else {

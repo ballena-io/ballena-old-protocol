@@ -6,6 +6,7 @@ module.exports = async function (deployer, network, accounts) {
   // Load network config data
   const networkConfigFilename = `.env.${network}.json`;
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
+  let txRegistry = networkConfig.txRegistry;
 
   // Get addresses
   const wbnbAddress = networkConfig.WBNB;
@@ -14,7 +15,9 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy RewardPool contract
   await deployer.deploy(RewardPool, wbnbAddress, balleAddress, treasuryAddress);
+  txRegistry.push(RewardPool.transactionHash);
 
+  networkConfig['txRegistry'] = txRegistry;
   networkConfig['rewardPoolAddress'] = RewardPool.address;
 
   fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });

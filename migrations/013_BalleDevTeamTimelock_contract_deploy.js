@@ -6,6 +6,7 @@ module.exports = async function (deployer, network, accounts) {
   // Load network config data
   const networkConfigFilename = `.env.${network}.json`;
   const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
+  let txRegistry = networkConfig.txRegistry;
 
   // Get addresses
   let internalAddress;
@@ -23,7 +24,9 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy BalleDevTeamTimelock contract
   await deployer.deploy(BalleDevTeamTimelock, balleAddress, internalAddress, internalReleaseTime);
-  
+  txRegistry.push(BalleDevTeamTimelock.transactionHash);
+
+  networkConfig['txRegistry'] = txRegistry;
   networkConfig['devTeamTimelockAddress'] = BalleDevTeamTimelock.address;
   networkConfig['internalReleaseTime'] = internalReleaseTime;
 
