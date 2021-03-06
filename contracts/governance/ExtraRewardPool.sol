@@ -33,7 +33,7 @@ contract ExtraRewardPool is Ownable {
         rewardedPools[_pool] = _multiplier;
     }
 
-    function getExtraReward(uint256 _amount) public returns (uint256) {
+    function getExtraReward(uint256 _amount) external returns (uint256) {
         uint256 extraReward = _amount.mul(rewardedPools[msg.sender]);
         if (extraReward > 0) {
             uint256 balance = balle.balanceOf(address(this));
