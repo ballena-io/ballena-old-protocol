@@ -1,64 +1,21 @@
-// contracts/mocks/PancakePair.sol
+// contracts/mocks/WBNB.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.4;
 
-contract WBNB {
-    string public name     = "Wrapped BNB";
-    string public symbol   = "WBNB";
-    uint8  public decimals = 18;
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./IMintableERC20.sol";
 
-    event  Approval(address indexed src, address indexed guy, uint wad);
-    event  Transfer(address indexed src, address indexed dst, uint wad);
-    event  Deposit(address indexed dst, uint wad);
-    event  Withdrawal(address indexed src, uint wad);
+contract WBNB is ERC20, IMintableERC20 {
 
-    mapping (address => uint)                       public  balanceOf;
-    mapping (address => mapping (address => uint))  public  allowance;
-
-    receive() external payable {
-        deposit();
-    }
-    function deposit() public payable {
-        balanceOf[msg.sender] += msg.value;
-        emit Deposit(msg.sender, msg.value);
-    }
-    function withdraw(uint wad) public {
-        require(balanceOf[msg.sender] >= wad);
-        balanceOf[msg.sender] -= wad;
-        msg.sender.transfer(wad);
-        emit Withdrawal(msg.sender, wad);
+    constructor() ERC20('Wrapped BNB', 'WBNB') {
+        _mint(msg.sender, 5000 * (10 ** uint256(decimals())));
     }
 
-    // function totalSupply() public view returns (uint) {
-    //    return this.balance;
-    // }
-
-    function approve(address guy, uint wad) public returns (bool) {
-        allowance[msg.sender][guy] = wad;
-        emit Approval(msg.sender, guy, wad);
-        return true;
+    function mint(address _to, uint256 _amount) public override {
+        _mint(_to, _amount);
     }
-
-    function transfer(address dst, uint wad) public returns (bool) {
-        return transferFrom(msg.sender, dst, wad);
-    }
-
-    function transferFrom(address src, address dst, uint wad)
-    public
-    returns (bool)
-    {
-        require(balanceOf[src] >= wad);
-
-        if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
-            require(allowance[src][msg.sender] >= wad);
-            allowance[src][msg.sender] -= wad;
-        }
-
-        balanceOf[src] -= wad;
-        balanceOf[dst] += wad;
-
-        emit Transfer(src, dst, wad);
-
-        return true;
+    
+    function burn(address _from ,uint256 _amount) public override {
+        _burn(_from, _amount);
     }
 }

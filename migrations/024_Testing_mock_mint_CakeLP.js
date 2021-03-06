@@ -5,42 +5,41 @@ const ERC20Token = artifacts.require('ERC20Token');
 const WBNB = artifacts.require('WBNB');
 
 module.exports = async function (deployer, network, accounts) {
-  // Load network config data
-  const networkConfigFilename = `.env.${network}.json`;
-  const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
-  let txRegistry = networkConfig.txRegistry;
 
-  if (network != 'bsc_mainnet') {
-    // Get addresses
-    const WBNBAddress = networkConfig.WBNB;
-    const BALBTAddress = networkConfig.BALBT;
-    const pancakePairAddress = networkConfig.PancakePairAddress;
+  if (network != 'develop') {
+    // Load network config data
+    const networkConfigFilename = `.env.${network}.json`;
+    const networkConfig = JSON.parse(fs.readFileSync(networkConfigFilename));
+    let txRegistry = networkConfig.txRegistry;
 
-    const wBNB = await WBNB.at(WBNBAddress);
+    if (network != 'bsc_mainnet') {
+      // Get addresses
+      const WBNBAddress = networkConfig.WBNB;
+      const BALBTAddress = networkConfig.BALBT;
+      const pancakePairAddress = networkConfig.PancakePairAddress;
 
-    let result = await wBNB.send("2000000000000000000"); // 2 BNB --> 2 WBNB
-    console.log(`TX: ${result.tx}`);
-    txRegistry.push(result.tx);
+      const wBNB = await WBNB.at(WBNBAddress);
 
-    result = await wBNB.transfer(pancakePairAddress, "2000000000000000000"); // 2 WBNB
-    console.log(`TX: ${result.tx}`);
-    txRegistry.push(result.tx);
+      let result = await wBNB.mint(pancakePairAddress, '2000000000000000000'); // 2 WBNB
+      console.log(`TX: ${result.tx}`);
+      txRegistry.push(result.tx);
 
-    const BALBT = await ERC20Token.at(BALBTAddress);
+      const BALBT = await ERC20Token.at(BALBTAddress);
 
-    result = await BALBT.transfer(pancakePairAddress, "3000000000000000000000"); // 3.000 BALBT
-    console.log(`TX: ${result.tx}`);
-    txRegistry.push(result.tx);
+      result = await BALBT.transfer(pancakePairAddress, '3000000000000000000000'); // 3000 BALBT
+      console.log(`TX: ${result.tx}`);
+      txRegistry.push(result.tx);
 
-    const pancakePair = await PancakePair.at(pancakePairAddress);
+      const pancakePair = await PancakePair.at(pancakePairAddress);
 
-    result = await pancakePair.mint(accounts[0]);
-    console.log(`TX: ${result.tx}`);
-    txRegistry.push(result.tx);
+      result = await pancakePair.mint(accounts[0]);
+      console.log(`TX: ${result.tx}`);
+      txRegistry.push(result.tx);
 
-    networkConfig['txRegistry'] = txRegistry;
+      networkConfig['txRegistry'] = txRegistry;
 
-    fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
+      fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
+    }
   }
-  
+    
 };

@@ -9,7 +9,7 @@
     "migrate": "npx truffle migrate --network development",
     "console": "npx truffle console --network development",
     "postinstall": "yarn compile",
-    "test": "npx truffle test"
+    "test": "npx truffle develop test"
   },
   "keywords": [],
   "author": "",
