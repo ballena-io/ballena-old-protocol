@@ -9,8 +9,8 @@ module.exports = async function (deployer, network, accounts) {
   let txRegistry = networkConfig.txRegistry;
 
   if (network != 'bsc_mainnet') {
-    const tokenA = networkConfig.TokenA;
-    const tokenB = networkConfig.TokenB;
+    const tokenA = networkConfig.BALBT;
+    const tokenB = networkConfig.WBNB;
     
     await deployer.deploy(PancakePair);
     txRegistry.push(PancakePair.transactionHash);

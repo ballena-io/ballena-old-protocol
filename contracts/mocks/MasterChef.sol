@@ -237,7 +237,7 @@ contract MasterChef is Ownable {
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accCakePerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
-                safeCakeTransfer(msg.sender, pending);
+                cake.mint(msg.sender, pending);
             }
         }
         if (_amount > 0) {
@@ -322,7 +322,7 @@ contract MasterChef is Ownable {
 
     // Safe cake transfer function, just in case if rounding error causes pool to not have enough CAKEs.
     function safeCakeTransfer(address _to, uint256 _amount) internal {
-        syrup.transfer(_to, _amount);
+        cake.transfer(_to, _amount);
     }
 
     // Update dev address by the previous dev.

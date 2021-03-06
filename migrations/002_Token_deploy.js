@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const BALLE = artifacts.require('BALLE');
-const ERC20Token = artifacts.require('ERC20Token');
+const WBNB = artifacts.require('WBNB');
 
 module.exports = async function (deployer, network, accounts) {
   // Load network config data
@@ -19,17 +19,11 @@ module.exports = async function (deployer, network, accounts) {
     txRegistry.push(BALLE.transactionHash);
 
     if (network == 'development') {
-      // deploy mock token contracts
-      let wbnb = await deployer.new(ERC20Token, 'Wrapped BNB', 'WBNB');
-      console.log(wbnb === undefined ? 'UNDEFINED!!??' : `OK ${wbnb.address}`);
-      if (wbnb === undefined) {
-        wbnb = await deployer.new(ERC20Token, 'Wrapped BNB', 'WBNB');
-        console.log(wbnb === undefined ? 'UNDEFINED!!??' : `OK ${wbnb.address}`);
-      }
-      console.log(`TX: ${wbnb.transactionHash}`);
-      txRegistry.push(wbnb.transactionHash);
+      // deploy mock WBNB contract
+      await deployer.deploy(WBNB);
+      txRegistry.push(WBNB.transactionHash);
       
-      networkConfig['WBNB'] = wbnb.address;
+      networkConfig['WBNB'] = WBNB.address;
     }
   } 
 

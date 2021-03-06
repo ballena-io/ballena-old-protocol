@@ -8,7 +8,7 @@ import "./IMintableERC20.sol";
 contract ERC20Token is ERC20, IMintableERC20 {
 
     constructor(string memory _name, string memory _symbol) ERC20(string(_name), string(_symbol)) {
-        _mint(msg.sender, 100 * (10 ** uint256(decimals())));
+        _mint(msg.sender, 5000 * (10 ** uint256(decimals())));
     }
 
     function mint(address _to, uint256 _amount) public override {

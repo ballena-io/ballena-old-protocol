@@ -11,15 +11,22 @@ module.exports = async function (deployer, network, accounts) {
   let txRegistry = networkConfig.txRegistry;
 
   // Get addresses
-  const pancakePairAddress = networkConfig.PancakePairAddress;
-  const pancakeRouterAddress = networkConfig.PancakeRouterAddress;
-  const masterChefAddress = networkConfig.MasterChefAddress;
   const vaultRewardPoolAddress = networkConfig.vaultRewardPoolAddress;
   const treasuryAddress = networkConfig.treasuryAddress;
   const rewardPoolAddress = networkConfig.rewardPoolAddress;
   const balle = networkConfig.BALLE;
   const wbnb = networkConfig.WBNB;
   const cake = networkConfig.CAKE;
+  // Vault data
+  const pancakePairAddress = networkConfig.PancakePairAddress;
+  const name = 'Balle Pancake bALBT-BNB';
+  const symbol = 'ballePancakeBALBT-BNB';
+  const approvalDelay = 60;
+  const rewardMultiplier = 100;
+  // Strategy data
+  const pancakeRouterAddress = networkConfig.PancakeRouterAddress;
+  const masterChefAddress = networkConfig.MasterChefAddress;
+  const poolId = 1;
 
   let nonce = await web3.eth.getTransactionCount(accounts[0])
   console.log('NONCE: ', nonce)
@@ -28,8 +35,8 @@ module.exports = async function (deployer, network, accounts) {
 
   let ballePancakeBALBT_BNB = await deployer.new(BalleRewardedVaultV1, 
     pancakePairAddress, strategyAddress, 
-    'Balle Pancake bALBT-BNB', 'ballePancakeBALBT-BNB', 60,
-    balle, vaultRewardPoolAddress, 100
+    name, symbol, approvalDelay,
+    balle, vaultRewardPoolAddress, rewardMultiplier
   );
   console.log(ballePancakeBALBT_BNB === undefined ? 'UNDEFINED!!??' : `OK ${ballePancakeBALBT_BNB.address}`);
   console.log(`TX: ${ballePancakeBALBT_BNB.transactionHash}\r\n`);
@@ -37,7 +44,7 @@ module.exports = async function (deployer, network, accounts) {
 
   let stratPancakeBALBT_BNB = await deployer.new(CakeLPStrategyV1,
     wbnb, balle, cake, pancakeRouterAddress, masterChefAddress,
-    pancakePairAddress, 103, rewardPoolAddress, treasuryAddress,
+    pancakePairAddress, poolId, rewardPoolAddress, treasuryAddress,
     ballePancakeBALBT_BNB.address
   );
   console.log(stratPancakeBALBT_BNB === undefined ? 'UNDEFINED!!??' : `OK ${stratPancakeBALBT_BNB.address}`);

@@ -12,11 +12,19 @@ module.exports = async function (deployer, network, accounts) {
     const cake = networkConfig.CAKE;
     const syrup = networkConfig.SYRUP;
     const devAddress = accounts[0];
+    const pancakePairAddress = networkConfig.PancakePairAddress;
 
     let block = await web3.eth.getBlock("latest")
 
-    await deployer.deploy(MasterChef, cake, syrup, devAddress, '1000000000000000000', block.number);
+    await deployer.deploy(MasterChef, cake, syrup, devAddress, '1000000000000000000', block.number); // 1 CAKE per block
     txRegistry.push(MasterChef.transactionHash);
+
+    // PENDIENTE EN TESTNET
+    // add created PancakePair to MasterChef
+    const masterChef = await MasterChef.deployed();
+    let result = await masterChef.add(1000, pancakePairAddress, true);
+    console.log(`TX: ${result.tx}`);
+    txRegistry.push(result.tx);
 
     networkConfig['txRegistry'] = txRegistry;
     networkConfig['MasterChefAddress'] = MasterChef.address;
