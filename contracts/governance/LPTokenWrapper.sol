@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 contract LPTokenWrapper {
     using SafeMath for uint256;
-    using SafeERC20 for IERC20;
 
     IERC20 public immutable balle;
 
@@ -33,7 +32,7 @@ contract LPTokenWrapper {
     function stake(uint256 amount) virtual public {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        balle.safeTransferFrom(msg.sender, address(this), amount);
+        balle.transferFrom(msg.sender, address(this), amount);
     }
 
     // withdraw visibility is public as it's meant to be called from derived contract
@@ -44,6 +43,6 @@ contract LPTokenWrapper {
             // just in case rounding
             amount = balle.balanceOf(address(this));
         }
-        balle.safeTransfer(msg.sender, amount);
+        balle.transfer(msg.sender, amount);
     }
 }

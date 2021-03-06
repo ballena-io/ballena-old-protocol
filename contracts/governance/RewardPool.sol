@@ -10,21 +10,15 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IRewardDistributionRecipient.sol";
+import "../interfaces/IExtraRewardPool.sol";
 import "./LPTokenWrapper.sol";
 
-/**********************************************
- * TO-DO List:
- *   - Implement separation between rewards funds and extra reward funds (maybe in other contract)
- *
- **********************************************/
 contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
-    using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
     IERC20 public immutable wbnb;
     uint256 public constant DURATION = 1 days;
 
-    uint16 public multiplier = 1;
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
     uint256 public lastUpdateTime;
@@ -33,6 +27,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     mapping(address => uint256) public rewards;
 
     address public immutable treasury;
+    address public immutable extraRewardPool;
 
     /**
      * @dev Reward Fee paid to treasury.
@@ -43,7 +38,6 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     uint constant public REWARD_FEE = 100;
     uint constant public REWARD_MAX = 1000;
 
-    event SetMultiplier(uint16 multiplier);
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
@@ -52,12 +46,14 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     constructor (
         address _wbnb, 
         address _balle,
-        address _treasury
+        address _treasury,
+        address _extraRewardPool
     ) LPTokenWrapper(
         address(_balle)
     ) {
         wbnb = IERC20(_wbnb);
         treasury = _treasury;
+        extraRewardPool = _extraRewardPool;
     }
 
     modifier updateReward(address account) {
@@ -92,7 +88,6 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         return
             balanceOf(account)
                 .mul(rewardPerToken().sub(userRewardPerTokenPaid[account]))
-                .mul(multiplier)
                 .div(1e18)
                 .add(rewards[account]);
     }
@@ -119,14 +114,16 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
+            uint256 extraReward = IExtraRewardPool(extraRewardPool).getExtraReward(reward);
+            reward += extraReward;
             uint256 rewardFee = reward.mul(REWARD_FEE).div(REWARD_MAX);
-            balle.safeTransfer(treasury, rewardFee);
+            balle.transfer(treasury, rewardFee);
             uint256 amount = reward.sub(rewardFee);
             if (balle.balanceOf(address(this)) < totalSupply().add(amount)) {
                 // just in case rounding
                 amount = balle.balanceOf(address(this)).sub(totalSupply());
             }
-            balle.safeTransfer(msg.sender, amount);
+            balle.transfer(msg.sender, amount);
             emit RewardPaid(msg.sender, reward);
         }
     }
@@ -146,17 +143,6 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         lastUpdateTime = block.timestamp;
         periodFinish = block.timestamp.add(DURATION);
         emit RewardAdded(reward);
-    }
-
-    function setMultiplier(uint16 _multiplier)
-        external
-        onlyOwner
-    {
-        require(_multiplier <= 10000, "Multiplier too high");
-        require(_multiplier > 0, "Multiplier too low");
-        multiplier = _multiplier;
-
-        emit SetMultiplier(_multiplier);
     }
 
 }

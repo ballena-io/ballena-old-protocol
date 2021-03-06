@@ -12,7 +12,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IRewardedVault.sol";
 
 contract VaultRewardPool is Ownable {
-    using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
     IERC20 public immutable balle;
@@ -119,7 +118,7 @@ contract VaultRewardPool is Ownable {
                 if (balle.balanceOf(address(this)) < amount) {
                     amount = balle.balanceOf(address(this));
                 }
-                balle.safeTransfer(activeVaults[i], amount);
+                balle.transfer(activeVaults[i], amount);
             }
         }
     }
