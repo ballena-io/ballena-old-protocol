@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 const RewardPool = artifacts.require('RewardPool');
+const ExtraRewardPool = artifacts.require('ExtraRewardPool');
 
 module.exports = async function (deployer, network, accounts) {
   // Load network config data
@@ -15,10 +16,13 @@ module.exports = async function (deployer, network, accounts) {
     const balleAddress = networkConfig.BALLE;
     const treasuryAddress = networkConfig.treasuryAddress;
 
+    // Deploy ExtraRewardPool contract
+    await deployer.deploy(ExtraRewardPool, balleAddress);
     // Deploy RewardPool contract
-    await deployer.deploy(RewardPool, wbnbAddress, balleAddress, treasuryAddress);
+    await deployer.deploy(RewardPool, wbnbAddress, balleAddress, treasuryAddress, ExtraRewardPool.address);
 
     networkConfig['rewardPoolAddress'] = RewardPool.address;
+    networkConfig['extraRewardPoolAddress'] = ExtraRewardPool.address;
 
   } else {
 
@@ -29,12 +33,17 @@ module.exports = async function (deployer, network, accounts) {
     const balleAddress = networkConfig.BALLE;
     const treasuryAddress = networkConfig.treasuryAddress;
 
+    // Deploy ExtraRewardPool contract
+    await deployer.deploy(ExtraRewardPool, balleAddress);
+    txRegistry.push(ExtraRewardPool.transactionHash);
+
     // Deploy RewardPool contract
-    await deployer.deploy(RewardPool, wbnbAddress, balleAddress, treasuryAddress);
+    await deployer.deploy(RewardPool, wbnbAddress, balleAddress, treasuryAddress, ExtraRewardPool.address);
     txRegistry.push(RewardPool.transactionHash);
 
     networkConfig['txRegistry'] = txRegistry;
     networkConfig['rewardPoolAddress'] = RewardPool.address;
+    networkConfig['extraRewardPoolAddress'] = ExtraRewardPool.address;
 
   }
 
