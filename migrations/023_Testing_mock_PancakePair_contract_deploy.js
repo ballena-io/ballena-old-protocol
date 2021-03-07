@@ -24,7 +24,7 @@ module.exports = async function (deployer, network, accounts) {
       txRegistry.push(result.tx);
       
       networkConfig['txRegistry'] = txRegistry;
-      networkConfig['PancakePairAddress'] = pancakePair.address;
+      networkConfig['pancakePairAddress'] = pancakePair.address;
 
       fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
     } 

@@ -18,8 +18,8 @@ module.exports = async function (deployer, network, accounts) {
     txRegistry.push(MulticallBnbShim.transactionHash);
 
     networkConfig['txRegistry'] = txRegistry;
-    networkConfig['Multicall'] = Multicall.address;
-    networkConfig['MulticallBnbShim'] = MulticallBnbShim.address;
+    networkConfig['multicall'] = Multicall.address;
+    networkConfig['multicallBnbShim'] = MulticallBnbShim.address;
 
     fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
   }

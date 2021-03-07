@@ -14,7 +14,7 @@ module.exports = async function (deployer, network, accounts) {
       const cake = networkConfig.CAKE;
       const syrup = networkConfig.SYRUP;
       const devAddress = accounts[0];
-      const pancakePairAddress = networkConfig.PancakePairAddress;
+      const pancakePairAddress = networkConfig.pancakePairAddress;
 
       let block = await web3.eth.getBlock("latest")
 
@@ -29,7 +29,7 @@ module.exports = async function (deployer, network, accounts) {
       txRegistry.push(result.tx);
 
       networkConfig['txRegistry'] = txRegistry;
-      networkConfig['MasterChefAddress'] = MasterChef.address;
+      networkConfig['masterChefAddress'] = MasterChef.address;
 
       fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
     } 

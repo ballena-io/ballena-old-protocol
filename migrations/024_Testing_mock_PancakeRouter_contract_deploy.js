@@ -11,13 +11,13 @@ module.exports = async function (deployer, network, accounts) {
     let txRegistry = networkConfig.txRegistry;
 
     if (network != 'bsc_mainnet') {
-      const pancakePairAddress = networkConfig.PancakePairAddress;
+      const pancakePairAddress = networkConfig.pancakePairAddress;
 
       await deployer.deploy(PancakeRouter, pancakePairAddress);
       txRegistry.push(PancakeRouter.transactionHash);
 
       networkConfig['txRegistry'] = txRegistry;
-      networkConfig['PancakeRouterAddress'] = PancakeRouter.address;
+      networkConfig['pancakeRouterAddress'] = PancakeRouter.address;
 
       fs.writeFileSync(networkConfigFilename, JSON.stringify(networkConfig, null, 2), { flag: 'w' });
     } 

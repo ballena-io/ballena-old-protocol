@@ -16,7 +16,7 @@ module.exports = async function (deployer, network, accounts) {
       // Get addresses
       const WBNBAddress = networkConfig.WBNB;
       const BALBTAddress = networkConfig.BALBT;
-      const pancakePairAddress = networkConfig.PancakePairAddress;
+      const pancakePairAddress = networkConfig.pancakePairAddress;
 
       const wBNB = await WBNB.at(WBNBAddress);
 

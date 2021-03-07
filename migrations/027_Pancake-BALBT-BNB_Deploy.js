@@ -20,14 +20,14 @@ module.exports = async function (deployer, network, accounts) {
     const wbnb = networkConfig.WBNB;
     const cake = networkConfig.CAKE;
     // Vault data
-    const pancakePairAddress = networkConfig.PancakePairAddress;
+    const pancakePairAddress = networkConfig.pancakePairAddress;
     const name = 'Balle Pancake bALBT-BNB';
     const symbol = 'ballePancakeBALBT-BNB';
     const approvalDelay = 60;
     const rewardMultiplier = 100;
     // Strategy data
-    const pancakeRouterAddress = networkConfig.PancakeRouterAddress;
-    const masterChefAddress = networkConfig.MasterChefAddress;
+    const pancakeRouterAddress = networkConfig.pancakeRouterAddress;
+    const masterChefAddress = networkConfig.masterChefAddress;
     const poolId = 1;
 
     let nonce = await web3.eth.getTransactionCount(accounts[0])
@@ -64,14 +64,14 @@ module.exports = async function (deployer, network, accounts) {
     const wbnb = networkConfig.WBNB;
     const cake = networkConfig.CAKE;
     // Vault data
-    const pancakePairAddress = networkConfig.PancakePairAddress;
+    const pancakePairAddress = networkConfig.pancakePairAddress;
     const name = 'Balle Pancake bALBT-BNB';
     const symbol = 'ballePancakeBALBT-BNB';
     const approvalDelay = 60;
     const rewardMultiplier = 100;
     // Strategy data
-    const pancakeRouterAddress = networkConfig.PancakeRouterAddress;
-    const masterChefAddress = networkConfig.MasterChefAddress;
+    const pancakeRouterAddress = networkConfig.pancakeRouterAddress;
+    const masterChefAddress = networkConfig.masterChefAddress;
     const poolId = 1;
 
     let nonce = await web3.eth.getTransactionCount(accounts[0])
