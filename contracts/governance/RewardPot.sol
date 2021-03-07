@@ -30,12 +30,12 @@ contract RewardPot is Ownable, IRewardPot {
         balle = IERC20(_balle);
     }
 
-    function activatePool(address _pool) external onlyOwner {
-        rewardedPools[_pool] = true;
+    function activatePool(address _pool, bool _state) external onlyOwner {
+        rewardedPools[_pool] = _state;
     }
 
     function getReward(uint256 _amount) override external returns (uint256) {
-        require(rewardedPools[msg.sender] = true);
+        require(rewardedPools[msg.sender] = true, "!authorized");
 
         uint256 reward = _amount;
         if (reward > 0) {
