@@ -35,7 +35,7 @@ contract RewardPot is Ownable, IRewardPot {
     }
 
     function getReward(uint256 _amount) override external returns (uint256) {
-        require(rewardedPools[msg.sender] = true, "!authorized");
+        require(rewardedPools[msg.sender] == true, "!authorized");
 
         uint256 reward = _amount;
         if (reward > 0) {
