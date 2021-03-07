@@ -32,6 +32,8 @@ contract VaultRewardPool is Ownable {
      * @param _balle the BALLE token.
      */
     constructor(address _balle) {
+        require(_balle != address(0), "Illegal address");
+        
         balle = IERC20(_balle);
     }
 

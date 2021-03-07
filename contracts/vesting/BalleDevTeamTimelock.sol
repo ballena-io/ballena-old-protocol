@@ -38,6 +38,9 @@ contract BalleDevTeamTimelock {
             _releaseTime > block.timestamp,
             "BalleDevTeamTimelock: release time is before current time"
         );
+        require(_balle != address(0), "Illegal address");
+        require(_destinationAddress != address(0), "Illegal address");
+
         balle = IERC20(_balle);
         destinationAddress = _destinationAddress;
         releaseTime = _releaseTime;

@@ -71,6 +71,10 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
         address(_vaultRewardPool),
         uint16 (_rewardMultiplier)
     ){
+        require(_token != address(0), "Illegal address");
+        require(_strategy != address(0), "Illegal address");
+        require(_balle != address(0), "Illegal address");
+
         token = IERC20(_token);
         strategy = _strategy;
         approvalDelay = _approvalDelay;

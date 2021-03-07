@@ -55,6 +55,11 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     ) LPTokenWrapper(
         address(_balle)
     ) {
+        require(_wbnb != address(0), "Illegal address");
+        require(_treasury != address(0), "Illegal address");
+        require(_rewardPot != address(0), "Illegal address");
+        require(_extraRewardPot != address(0), "Illegal address");
+        
         wbnb = IERC20(_wbnb);
         treasury = _treasury;
         rewardPot = _rewardPot;

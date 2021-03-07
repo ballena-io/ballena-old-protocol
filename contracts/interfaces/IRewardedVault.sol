@@ -19,6 +19,8 @@ abstract contract IRewardedVault is Ownable {
      * @param _multiplier the reward multiplier for the vault (100 = x1).
      */
     constructor (address _vaultRewardPool, uint16 _multiplier) {
+        require(_vaultRewardPool != address(0), "Illegal address");
+        
         vaultRewardPool = _vaultRewardPool;
         multiplier = _multiplier;
     }

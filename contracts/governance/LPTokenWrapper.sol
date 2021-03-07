@@ -15,6 +15,8 @@ contract LPTokenWrapper {
     mapping(address => uint256) private _balances;
 
     constructor (address _balle) {
+        require(_balle != address(0), "Illegal address");
+        
         balle = IERC20(_balle);
     }
 

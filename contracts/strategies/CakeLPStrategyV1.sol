@@ -116,6 +116,16 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
         address _treasury, 
         address _vault
     ) {
+        require(_wbnb != address(0), "Illegal address");
+        require(_balle != address(0), "Illegal address");
+        require(_cake != address(0), "Illegal address");
+        require(_unirouter != address(0), "Illegal address");
+        require(_masterchef != address(0), "Illegal address");
+        require(_lpPair != address(0), "Illegal address");
+        require(_rewardPot != address(0), "Illegal address");
+        require(_treasury != address(0), "Illegal address");
+        require(_vault != address(0), "Illegal address");
+
         wbnb = _wbnb;
         balle = _balle;
         cake = _cake;

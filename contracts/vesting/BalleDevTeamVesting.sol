@@ -69,6 +69,9 @@ contract BalleDevTeamVesting {
         address _balle, 
         address _destinationAddress
     ) {
+        require(_balle != address(0), "Illegal address");
+        require(_destinationAddress != address(0), "Illegal address");
+
         balle = IERC20(_balle);
         destinationAddress = _destinationAddress;
         initVestingStages();
