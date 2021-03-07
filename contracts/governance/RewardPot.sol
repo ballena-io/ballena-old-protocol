@@ -1,4 +1,4 @@
-// contracts/governance/ExtraRewardPool.sol
+// contracts/governance/RewardPot.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.4;
 
@@ -9,16 +9,18 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/IRewardPot.sol";
 
 /**
- * @dev This contract holds the BALLE supply that will be rewarded to holders in governance pools.
+ * @dev This contract holds the BALLE commisions from vaults that will be 
+ * rewarded to holders in governance pools.
  */
-contract ExtraRewardPool is Ownable {
+contract RewardPot is Ownable, IRewardPot {
     using SafeMath for uint256;
 
     IERC20 public immutable balle;
 
-    mapping(address => uint16) public rewardedPools;
+    mapping(address => bool) public rewardedPools;
 
     /**
      * @dev Sets the value of {balle} to the BALLE token that the vault will hold and distribute.
@@ -28,23 +30,24 @@ contract ExtraRewardPool is Ownable {
         balle = IERC20(_balle);
     }
 
-    function activatePool(address _pool, uint16 _multiplier) external onlyOwner {
-        require(_multiplier <= 10000, "Multiplier too high");
-        rewardedPools[_pool] = _multiplier;
+    function activatePool(address _pool) external onlyOwner {
+        rewardedPools[_pool] = true;
     }
 
-    function getExtraReward(uint256 _amount) external returns (uint256) {
-        uint256 extraReward = _amount.mul(rewardedPools[msg.sender]);
-        if (extraReward > 0) {
+    function getReward(uint256 _amount) override external returns (uint256) {
+        require(rewardedPools[msg.sender] = true);
+
+        uint256 reward = _amount;
+        if (reward > 0) {
             uint256 balance = balle.balanceOf(address(this));
-            if (balance < extraReward) {
-                extraReward = balance;
+            if (balance < reward) {
+                reward = balance;
             }
-            if (extraReward > 0) {
-                balle.transfer(msg.sender, extraReward);
+            if (reward > 0) {
+                balle.transfer(msg.sender, reward);
             }
         }
-        return extraReward;
+        return reward;
     }
 
 }

@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IRewardDistributionRecipient.sol";
-import "../interfaces/IExtraRewardPool.sol";
+import "../interfaces/IRewardPot.sol";
 import "./LPTokenWrapper.sol";
 
 contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
@@ -25,9 +25,11 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     uint256 public rewardPerTokenStored;
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
+    uint256 public pendingRewards = 0;
 
     address public immutable treasury;
-    address public immutable extraRewardPool;
+    address public immutable rewardPot;
+    address public immutable extraRewardPot;
 
     /**
      * @dev Reward Fee paid to treasury.
@@ -38,6 +40,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
     uint constant public REWARD_FEE = 100;
     uint constant public REWARD_MAX = 1000;
 
+    event RewardReceived(uint256 reward);
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
@@ -47,13 +50,15 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         address _wbnb, 
         address _balle,
         address _treasury,
-        address _extraRewardPool
+        address _rewardPot,
+        address _extraRewardPot
     ) LPTokenWrapper(
         address(_balle)
     ) {
         wbnb = IERC20(_wbnb);
         treasury = _treasury;
-        extraRewardPool = _extraRewardPool;
+        rewardPot = _rewardPot;
+        extraRewardPot = _extraRewardPot;
     }
 
     modifier updateReward(address account) {
@@ -114,7 +119,7 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            uint256 extraReward = IExtraRewardPool(extraRewardPool).getExtraReward(reward);
+            uint256 extraReward = IRewardPot(extraRewardPot).getReward(reward);
             reward += extraReward;
             uint256 rewardFee = reward.mul(REWARD_FEE).div(REWARD_MAX);
             balle.transfer(treasury, rewardFee);
@@ -128,11 +133,12 @@ contract RewardPool is LPTokenWrapper, IRewardDistributionRecipient {
         }
     }
 
-    function notifyRewardAmount(uint256 reward)
+    function notifyRewardAmount(uint256 _reward)
         external override
         onlyRewardDistribution
         updateReward(address(0))
     {
+        uint256 reward = IRewardPot(rewardPot).getReward(_reward);
         if (block.timestamp >= periodFinish) {
             rewardRate = reward.div(DURATION);
         } else {
