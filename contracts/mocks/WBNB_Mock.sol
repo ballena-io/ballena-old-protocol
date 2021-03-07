@@ -1,8 +1,8 @@
-// contracts/mocks/WBNB_.sol
+// contracts/mocks/WBNB_Mock.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.4;
 
-contract WBNB_ {
+contract WBNB_Mock {
     string public name     = "Wrapped BNB";
     string public symbol   = "WBNB";
     uint8  public decimals = 18;
