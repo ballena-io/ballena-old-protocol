@@ -1,9 +1,8 @@
 import { BALLEInstance, RewardPotInstance } from "../types/truffle-contracts"
 
-contract.only('RewardPot', ([owner, account1, account2, account3, account4]) => {
+contract('RewardPot', ([owner, account1, account2, account3, account4]) => {
     const RewardPot = artifacts.require('RewardPot')
     const BALLE = artifacts.require('BALLE')
-    const WBNB = artifacts.require('WBNB')
     const toBN = web3.utils.toBN
     
     describe('Test transfer and protected methods', () => {

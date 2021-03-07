@@ -1,40 +1,20 @@
-import { BALLEInstance, RewardPoolInstance } from "../types/truffle-contracts"
+import { BALLEInstance, ExtraRewardPotInstance, RewardPotInstance, RewardPoolInstance, BalleTreasuryInstance } from "../types/truffle-contracts"
 
 contract.only('RewardPool', ([owner, account1, account2, account3, account4]) => {
+    const Treasury = artifacts.require('BalleTreasury')
+    const ExtraRewardPot = artifacts.require('ExtraRewardPot')
+    const RewardPot = artifacts.require('RewardPot')
     const RewardPool = artifacts.require('RewardPool')
     const BALLE = artifacts.require('BALLE')
     const WBNB = artifacts.require('WBNB')
     const toBN = web3.utils.toBN
     
-    describe('Test transfer and protected methods', () => {
+    describe('Test protected methods', () => {
         let rewardPoolInstance: RewardPoolInstance
 
         beforeEach(async () => {
             // To deploy a new contract for each test, use .new() instead of .deployed()
             rewardPoolInstance = await RewardPool.deployed()
-        })
-
-        it('should accept payments from strategy', async () => {
-            const balleInstance = await BALLE.deployed()
-            await balleInstance.addMinter(owner);
-            await balleInstance.mint(rewardPoolInstance.address, toBN(1e18))
-            const balance = await balleInstance.balanceOf(rewardPoolInstance.address)
-            
-            expect(balance.toString()).to.be.eq(toBN(1E18).toString())
-        })
-
-        it('should not send the funds out', async () => {
-            const balleInstance = await BALLE.deployed()
-            
-            const balance = await balleInstance.balanceOf(rewardPoolInstance.address)
-            const res = await balleInstance.transferFrom(
-                rewardPoolInstance.address, account1, toBN(1e18))
-                .catch((err: Error) => err)
-            
-            expect(balance.toString()).to.be.eq(toBN(1E18).toString())
-            expect(res)
-                .to.be.an.instanceOf(Error)
-                .and.to.have.property('reason')
         })
 
         it('should not allow to call protected setRewardDistribution()', async () => {
@@ -54,35 +34,6 @@ contract.only('RewardPool', ([owner, account1, account2, account3, account4]) =>
                 .to.be.an.instanceOf(Error)
                 .and.to.have.property('reason')
                 .to.be.equal('Caller is not reward distribution')
-        })
-
-        it('should allow rewardDistribution to call notifyRewardAmount()', async () => {
-            const balleInstance = await BALLE.deployed()
-
-            await rewardPoolInstance.setRewardDistribution(owner)
-            const res = await rewardPoolInstance.notifyRewardAmount(toBN(5e18))
-
-            // Inspect data
-            const rewardPoolBalance = await balleInstance.balanceOf(rewardPoolInstance.address)
-            const stakedBalance = await rewardPoolInstance.totalSupply()
-            const lastTimeRewardApplicable = await rewardPoolInstance.lastTimeRewardApplicable()
-            const periodFinish = await rewardPoolInstance.periodFinish()
-            const rewardRate = await rewardPoolInstance.rewardRate()
-            const lastUpdateTime = await rewardPoolInstance.lastUpdateTime()
-            const rewardPerToken = await rewardPoolInstance.rewardPerToken()
-            const rewardPerTokenStored = await rewardPoolInstance.rewardPerTokenStored()
-            console.log(`rewardBalance: ${rewardPoolBalance.toString()}`)
-            console.log(`stakedBalance: ${stakedBalance.toString()}`)
-            console.log(`lastTimeRewardApplicable: ${lastTimeRewardApplicable.toString()}`)
-            console.log(`periodFinish: ${periodFinish.toString()}`)
-            console.log(`rewardRate: ${rewardRate.toString()}`)
-            console.log(`lastUpdateTime: ${lastUpdateTime.toString()}`)
-            console.log(`rewardPerToken: ${rewardPerToken.toString()}`)
-            console.log(`rewardPerTokenStored: ${rewardPerTokenStored.toString()}`)
-            //
-            
-            expect(res)
-                .to.have.property('tx')
         })
 
     })
@@ -114,8 +65,8 @@ contract.only('RewardPool', ([owner, account1, account2, account3, account4]) =>
             // Get staked BALLE tokens
             const stakedBalance = await rewardPoolInstance.totalSupply()
 
-            expect(rewardPoolBalance.toString()).to.be.eq(toBN(11E18).toString())
-            expect(stakedBalance.toString()).to.be.eq(toBN(10E18).toString())
+            expect(rewardPoolBalance.toString()).to.be.eq(toBN(10e18).toString())
+            expect(stakedBalance.toString()).to.be.eq(toBN(10e18).toString())
         })
 
         it('should not accept other coins staking', async () => {
@@ -135,8 +86,8 @@ contract.only('RewardPool', ([owner, account1, account2, account3, account4]) =>
             expect(res)
                 .to.be.an.instanceOf(Error)
                 .and.to.have.property('reason')
-            expect(rewardPoolBalance.toString()).to.be.eq(toBN(11E18).toString())
-            expect(stakedBalance.toString()).to.be.eq(toBN(10E18).toString())
+            expect(rewardPoolBalance.toString()).to.be.eq(toBN(10e18).toString())
+            expect(stakedBalance.toString()).to.be.eq(toBN(10e18).toString())
         })
 
         it('should respect allowance limit', async () => {
@@ -159,19 +110,21 @@ contract.only('RewardPool', ([owner, account1, account2, account3, account4]) =>
             const stakedBalance = await rewardPoolInstance.totalSupply()
             const userBalance = await rewardPoolInstance.balanceOf(owner)
             
-            expect(rewardPoolBalance.toString()).to.be.eq(toBN(16E18).toString())
-            expect(stakedBalance.toString()).to.be.eq(toBN(15E18).toString())
-            expect(userBalance.toString()).to.be.eq(toBN(10E18).toString())
+            expect(rewardPoolBalance.toString()).to.be.eq(toBN(15e18).toString())
+            expect(stakedBalance.toString()).to.be.eq(toBN(15e18).toString())
+            expect(userBalance.toString()).to.be.eq(toBN(10e18).toString())
         })
 
     })
 
-    describe('Test rewards', () => {
+    describe('Test notify rewards', () => {
+        let rewardPotInstance: RewardPotInstance
         let rewardPoolInstance: RewardPoolInstance
         let balleInstance: BALLEInstance
 
         beforeEach(async () => {
             // To deploy a new contract for each test, use .new() instead of .deployed()
+            rewardPotInstance = await RewardPot.deployed()
             rewardPoolInstance = await RewardPool.deployed()
             balleInstance = await BALLE.deployed()
         })
@@ -182,40 +135,132 @@ contract.only('RewardPool', ([owner, account1, account2, account3, account4]) =>
             const stakedBalance = await rewardPoolInstance.totalSupply()
             const userBalance = await rewardPoolInstance.balanceOf(owner)
 
-            expect(rewardPoolBalance.toString()).to.be.eq(toBN(16E18).toString())
-            expect(stakedBalance.toString()).to.be.eq(toBN(15E18).toString())
-            expect(userBalance.toString()).to.be.eq(toBN(10E18).toString())
+            expect(rewardPoolBalance.toString()).to.be.eq(toBN(15e18).toString())
+            expect(stakedBalance.toString()).to.be.eq(toBN(15e18).toString())
+            expect(userBalance.toString()).to.be.eq(toBN(10e18).toString())
         })
 
         it('should allow rewardDistribution to call notifyRewardAmount()', async () => {
             const balleInstance = await BALLE.deployed()
-
+            // activate pool on RewardPot
+            await rewardPotInstance.activatePool(rewardPoolInstance.address, true)
+            // fund pot (this is done from strategies, as commisions get generated)
+            await balleInstance.mint(rewardPotInstance.address, toBN(1e18));
+            // notify pool of new reward ammount available
             await rewardPoolInstance.setRewardDistribution(owner)
-            const res = await rewardPoolInstance.notifyRewardAmount(toBN(1e18))
+            await rewardPoolInstance.notifyRewardAmount(toBN(1e18))
+
+            // check balances
+            const rewardPoolBalance = await balleInstance.balanceOf(rewardPoolInstance.address)
+            const rewardPotBalance = await balleInstance.balanceOf(rewardPotInstance.address)
+            const stakedBalance = await rewardPoolInstance.totalSupply()
             
-            // Inspect data
+            expect(rewardPotBalance.toString()).to.be.eq(toBN(0).toString())
+            expect(rewardPoolBalance.toString()).to.be.eq(toBN(16e18).toString())
+            expect(stakedBalance.toString()).to.be.eq(toBN(15e18).toString())
+        })
+
+    })
+
+    describe('Test pool withdraw', () => {
+        let treasuryInstance: BalleTreasuryInstance
+        let extraRewardPotInstance: ExtraRewardPotInstance
+        let rewardPotInstance: RewardPotInstance
+        let rewardPoolInstance: RewardPoolInstance
+        let balleInstance: BALLEInstance
+
+        beforeEach(async () => {
+            // To deploy a new contract for each test, use .new() instead of .deployed()
+            treasuryInstance = await Treasury.deployed()
+            extraRewardPotInstance = await ExtraRewardPot.deployed()
+            rewardPotInstance = await RewardPot.deployed()
+            rewardPoolInstance = await RewardPool.deployed()
+            balleInstance = await BALLE.deployed()
+        })
+
+        it('should check balances', async () => {
+            // Check starting balances
             const rewardPoolBalance = await balleInstance.balanceOf(rewardPoolInstance.address)
             const stakedBalance = await rewardPoolInstance.totalSupply()
-            const lastTimeRewardApplicable = await rewardPoolInstance.lastTimeRewardApplicable()
-            const periodFinish = await rewardPoolInstance.periodFinish()
-            const rewardRate = await rewardPoolInstance.rewardRate()
-            const lastUpdateTime = await rewardPoolInstance.lastUpdateTime()
-            const rewardPerToken = await rewardPoolInstance.rewardPerToken()
-            const rewardPerTokenStored = await rewardPoolInstance.rewardPerTokenStored()
-            const pendingRewards = await rewardPoolInstance.pendingRewards()
-            console.log(`rewardBalance: ${rewardPoolBalance.toString()}`)
-            console.log(`stakedBalance: ${stakedBalance.toString()}`)
-            console.log(`lastTimeRewardApplicable: ${lastTimeRewardApplicable.toString()}`)
-            console.log(`periodFinish: ${periodFinish.toString()}`)
-            console.log(`rewardRate: ${rewardRate.toString()}`)
-            console.log(`lastUpdateTime: ${lastUpdateTime.toString()}`)
-            console.log(`rewardPerToken: ${rewardPerToken.toString()}`)
-            console.log(`rewardPerTokenStored: ${rewardPerTokenStored.toString()}`)
-            console.log(`pendingRewards: ${pendingRewards.toString()}`)
-            //
-            
-            expect(res)
-                .to.have.property('tx')
+            const user1Balance = await rewardPoolInstance.balanceOf(owner)
+            const user2Balance = await rewardPoolInstance.balanceOf(account1)
+            const treasuryBalance = await balleInstance.balanceOf(treasuryInstance.address)
+            const user1WalletBalance = await balleInstance.balanceOf(owner)
+            const user2WalletBalance = await balleInstance.balanceOf(account1)
+
+            expect(rewardPoolBalance.toString()).to.be.eq(toBN(16e18).toString())
+            expect(stakedBalance.toString()).to.be.eq(toBN(15e18).toString())
+            expect(user1Balance.toString()).to.be.eq(toBN(10e18).toString())
+            expect(user2Balance.toString()).to.be.eq(toBN(5e18).toString())
+            expect(treasuryBalance.toString()).to.be.eq(toBN(0).toString())
+            expect(user1WalletBalance.toString()).to.be.eq(toBN(0).toString())
+            expect(user2WalletBalance.toString()).to.be.eq(toBN(0).toString())
+        })
+
+        it('should withdraw partial stake and rewards', async () => {
+            // withdraw 5 BALLE
+            await rewardPoolInstance.withdraw(toBN(5e18))
+
+            // check balances
+            const rewardPoolBalance = await balleInstance.balanceOf(rewardPoolInstance.address)
+            const userBalance = await rewardPoolInstance.balanceOf(owner)
+            const stakedBalance = await rewardPoolInstance.totalSupply()
+            const treasuryBalance = await balleInstance.balanceOf(treasuryInstance.address)
+            const user1WalletBalance = await balleInstance.balanceOf(owner)
+
+            console.log(`user1WalletBalance: ${user1WalletBalance}`)
+            console.log(`rewardPoolBalance: ${rewardPoolBalance}`)
+            console.log(`treasuryBalance: ${treasuryBalance}`)
+
+            expect(rewardPoolBalance.toString()).to.be.eq(toBN(11e18).toString())
+            expect(stakedBalance.toString()).to.be.eq(toBN(10e18).toString())
+            expect(userBalance.toString()).to.be.eq(toBN(5e18).toString())
+        })
+
+        it('should withdraw all balance and rewards', async () => {
+            // exit pool (user2, 5 BALLE)
+            await rewardPoolInstance.exit({from: account1})
+
+            // check balances
+            const rewardPoolBalance = await balleInstance.balanceOf(rewardPoolInstance.address)
+            const userBalance = await rewardPoolInstance.balanceOf(account1)
+            const stakedBalance = await rewardPoolInstance.totalSupply()
+            const treasuryBalance = await balleInstance.balanceOf(treasuryInstance.address)
+            const user2WalletBalance = await balleInstance.balanceOf(account1)
+
+            expect(stakedBalance.toString()).to.be.eq(toBN(5e18).toString())
+            expect(userBalance.toString()).to.be.eq(toBN(0).toString())
+            expect(rewardPoolBalance.add(user2WalletBalance).add(treasuryBalance).toString())
+                .to.be.eq(toBN(11e18).toString())
+        })
+
+        it('should activate extra rewards for the pool', async () => {
+            // activate pool on ExtraRewardPot
+            await extraRewardPotInstance.activatePool(rewardPoolInstance.address, 200)
+            // fund extra pot (this is done on BALLE minting)
+            await balleInstance.mint(extraRewardPotInstance.address, toBN(10e18));
+
+            expect(true)
+        })
+
+        it('should get rewards', async () => {
+            // get rewards (user1)
+            await rewardPoolInstance.getReward()
+
+            // check balances
+            const rewardPoolBalance = await balleInstance.balanceOf(rewardPoolInstance.address)
+            const userBalance = await rewardPoolInstance.balanceOf(owner)
+            const stakedBalance = await rewardPoolInstance.totalSupply()
+            const treasuryBalance = await balleInstance.balanceOf(treasuryInstance.address)
+            const extraRewardPotBalance = await balleInstance.balanceOf(extraRewardPotInstance.address)
+            const userWalletBalance = await balleInstance.balanceOf(owner)
+            const user2WalletBalance = await balleInstance.balanceOf(account1)
+
+            expect(stakedBalance.toString()).to.be.eq(toBN(5e18).toString())
+            expect(userBalance.toString()).to.be.eq(toBN(5e18).toString())
+            expect(rewardPoolBalance.add(user2WalletBalance).add(treasuryBalance)
+                .add(userWalletBalance).sub(toBN(5e18)).add(extraRewardPotBalance).toString())
+                .to.be.eq(toBN(21e18).toString())
         })
 
     })
