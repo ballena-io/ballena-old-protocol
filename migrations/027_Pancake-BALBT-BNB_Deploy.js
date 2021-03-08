@@ -38,7 +38,7 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(BalleRewardedVaultV1, 
       pancakePairAddress, strategyAddress, 
       name, symbol, approvalDelay,
-      balle, vaultRewardPoolAddress, rewardMultiplier
+      balle, vaultRewardPoolAddress
     );
 
     await deployer.deploy(CakeLPStrategyV1,
@@ -82,7 +82,7 @@ module.exports = async function (deployer, network, accounts) {
     let ballePancakeBALBT_BNB = await deployer.new(BalleRewardedVaultV1, 
       pancakePairAddress, strategyAddress, 
       name, symbol, approvalDelay,
-      balle, vaultRewardPoolAddress, rewardMultiplier
+      balle, vaultRewardPoolAddress
     );
     console.log(ballePancakeBALBT_BNB === undefined ? 'UNDEFINED!!??' : `OK ${ballePancakeBALBT_BNB.address}`);
     console.log(`TX: ${ballePancakeBALBT_BNB.transactionHash}\r\n`);

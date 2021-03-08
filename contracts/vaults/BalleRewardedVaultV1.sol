@@ -10,14 +10,14 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IStrategy.sol";
-import "../interfaces/IRewardedVault.sol";
+import "../interfaces/IVaultRewardPool.sol";
 
 /**
  * @dev Implementation of a vault to deposit funds for yield optimizing.
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
+contract BalleRewardedVaultV1 is ERC20, Ownable {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
@@ -37,6 +37,8 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
     uint256 public immutable approvalDelay;
     // The BALLE token used for rewards.
     IERC20 public immutable balle;
+    // The BALLE token reward pool.
+    IVaultRewardPool public immutable vaultRewardPool;
 
     event NewStratCandidate(address implementation);
     event UpgradeStrat(address implementation);
@@ -53,7 +55,6 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * @param _approvalDelay the delay before a new strat can be approved.
      * @param _balle the BALLE token for rewards.
      * @param _vaultRewardPool the address of the reward pool for the vault.
-     * @param _rewardMultiplier the reward multiplier for the vault (100 = x1).
      */
     constructor (
         address _token,
@@ -62,23 +63,21 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
         string memory _symbol,
         uint256 _approvalDelay,
         address _balle,
-        address _vaultRewardPool,
-        uint16 _rewardMultiplier
+        address _vaultRewardPool
     ) ERC20(
         string(_name),
         string(_symbol)
-    ) IRewardedVault (
-        address(_vaultRewardPool),
-        uint16 (_rewardMultiplier)
     ){
         require(_token != address(0), "Illegal address");
         require(_strategy != address(0), "Illegal address");
         require(_balle != address(0), "Illegal address");
+        require(_vaultRewardPool != address(0), "Illegal address");
 
         token = IERC20(_token);
         strategy = _strategy;
         approvalDelay = _approvalDelay;
         balle = IERC20(_balle);
+        vaultRewardPool = IVaultRewardPool(_vaultRewardPool);
     }
 
     /**
@@ -159,6 +158,9 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * tokens are burned in the process.
      */
     function withdraw(uint256 _shares) public {
+        // get vault pending BALLE rewards
+        vaultRewardPool.getVaultRewards();
+        
         uint256 r = (balance().mul(_shares)).div(totalSupply());
         uint256 bb = balle.balanceOf(address(this));
         uint256 reward = (bb.mul(_shares)).div(totalSupply());
@@ -221,7 +223,7 @@ contract BalleRewardedVaultV1 is ERC20, Ownable, IRewardedVault {
      * @dev Function for various UIs to display the current BALLE reward per share.
      * Returns an uint256 with 18 decimals of how much BALLE one vault share represents.
      */
-    function getRewardPerFullShare() override external view returns (uint256) {
+    function getRewardPerFullShare() external view returns (uint256) {
         return totalSupply() == 0 ? balle.balanceOf(address(this)) : balle.balanceOf(address(this)).mul(1e18).div(totalSupply());
     }
 

@@ -13,7 +13,6 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../interfaces/IPancakeRouter.sol";
 import "../interfaces/IPancakePair.sol";
 import "../interfaces/IMasterChef.sol";
-import "../interfaces/IRewardedVault.sol";
 
 /**
  * @dev Implementation of a strategy to get yields from farming LP Pools in PancakeSwap.
@@ -309,7 +308,6 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      */
     function pause() public onlyOwner {
         _pause();
-        IRewardedVault(vault).retireVault();
 
         IERC20(lpPair).safeApprove(masterchef, 0);
         IERC20(cake).safeApprove(unirouter, 0);
@@ -323,7 +321,6 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
      */
     function unpause() external onlyOwner {
         _unpause();
-        IRewardedVault(vault).activateVault();
 
         IERC20(lpPair).safeApprove(masterchef, uint(-1));
         IERC20(cake).safeApprove(unirouter, uint(-1));
