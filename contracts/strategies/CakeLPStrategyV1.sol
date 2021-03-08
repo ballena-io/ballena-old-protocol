@@ -226,6 +226,7 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
     function chargeFees() internal {
         uint256 toWbnb = IERC20(cake).balanceOf(address(this)).mul(40).div(1000);
         IPancakeRouter(unirouter).swapExactTokensForTokens(toWbnb, 0, cakeToWbnbRoute, address(this), block.timestamp.add(600));
+        // no need to check output amount, all operation go against any output we get
         
         uint256 wbnbBal = IERC20(wbnb).balanceOf(address(this));
 
@@ -234,6 +235,7 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
 
         uint256 rewardsFee = wbnbBal.mul(REWARDS_FEE).div(MAX_FEE);
         IPancakeRouter(unirouter).swapExactTokensForTokens(rewardsFee, 0, wbnbToBalleRoute, rewardPot, block.timestamp.add(600));
+        // no need to check output amount, any qty we get is ok as fee
     }
 
     /**
@@ -244,15 +246,18 @@ contract CakeLPStrategyV1 is Ownable, Pausable {
         
         if (lpToken0 != cake) {
             IPancakeRouter(unirouter).swapExactTokensForTokens(cakeHalf, 0, cakeToLp0Route, address(this), block.timestamp.add(600));
+            // no need to check output amount
         }
 
         if (lpToken1 != cake) {
             IPancakeRouter(unirouter).swapExactTokensForTokens(cakeHalf, 0, cakeToLp1Route, address(this), block.timestamp.add(600));
+            // no need to check output amount
         }
 
         uint256 lp0Bal = IERC20(lpToken0).balanceOf(address(this));
         uint256 lp1Bal = IERC20(lpToken1).balanceOf(address(this));
         IPancakeRouter(unirouter).addLiquidity(lpToken0, lpToken1, lp0Bal, lp1Bal, 1, 1, address(this), block.timestamp.add(600));
+        // no need to check output amount, all liquidity gain we can archieve will be good
     }
 
     /**

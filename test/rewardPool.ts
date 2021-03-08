@@ -1,6 +1,6 @@
 import { BALLEInstance, ExtraRewardPotInstance, RewardPotInstance, RewardPoolInstance, BalleTreasuryInstance } from "../types/truffle-contracts"
 
-contract.only('RewardPool', ([owner, account1, account2, account3, account4]) => {
+contract('RewardPool', ([owner, account1, account2, account3, account4]) => {
     const Treasury = artifacts.require('BalleTreasury')
     const ExtraRewardPot = artifacts.require('ExtraRewardPot')
     const RewardPot = artifacts.require('RewardPot')
@@ -205,12 +205,6 @@ contract.only('RewardPool', ([owner, account1, account2, account3, account4]) =>
             const rewardPoolBalance = await balleInstance.balanceOf(rewardPoolInstance.address)
             const userBalance = await rewardPoolInstance.balanceOf(owner)
             const stakedBalance = await rewardPoolInstance.totalSupply()
-            const treasuryBalance = await balleInstance.balanceOf(treasuryInstance.address)
-            const user1WalletBalance = await balleInstance.balanceOf(owner)
-
-            console.log(`user1WalletBalance: ${user1WalletBalance}`)
-            console.log(`rewardPoolBalance: ${rewardPoolBalance}`)
-            console.log(`treasuryBalance: ${treasuryBalance}`)
 
             expect(rewardPoolBalance.toString()).to.be.eq(toBN(11e18).toString())
             expect(stakedBalance.toString()).to.be.eq(toBN(10e18).toString())
