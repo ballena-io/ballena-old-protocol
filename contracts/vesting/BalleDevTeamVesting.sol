@@ -24,11 +24,6 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
  * Six instances of the contract will be deployed for holding tokens for each wallet.
  * 
  */
-/**********************************************
- * TO-DO List:
- *   - Set final release dates (initVestingStages)
- *
- **********************************************/
 contract BalleDevTeamVesting {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
@@ -110,11 +105,11 @@ contract BalleDevTeamVesting {
      * @dev Setup array with vesting stages dates and percents.
      */
     function initVestingStages () internal {
-        stages[0].date = 1614960000;
-        stages[1].date = 1622563200;
-        stages[2].date = 1630512000;
-        stages[3].date = 1638374400;
-        stages[4].date = 1646150400;
+        stages[0].date = 1615334400;
+        stages[1].date = 1623283200;
+        stages[2].date = 1631232000;
+        stages[3].date = 1639094400;
+        stages[4].date = 1646870400;
 
         stages[0].tokensUnlockedPercentage = 20;
         stages[1].tokensUnlockedPercentage = 40;
