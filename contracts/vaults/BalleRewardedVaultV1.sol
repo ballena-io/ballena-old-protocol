@@ -227,4 +227,11 @@ contract BalleRewardedVaultV1 is ERC20, Ownable {
         return totalSupply() == 0 ? balle.balanceOf(address(this)) : balle.balanceOf(address(this)).mul(1e18).div(totalSupply());
     }
 
+    /**
+     * @dev Function to force widthdraw vault pending rewards
+     */
+    function getVaultRewards() external {
+        vaultRewardPool.getVaultRewards();
+    }
+
 }
