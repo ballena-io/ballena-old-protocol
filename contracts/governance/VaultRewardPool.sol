@@ -45,13 +45,21 @@ contract VaultRewardPool is Ownable {
         require(_multiplier > 0, "Multiplier too low");
 
         uint8 numActiveVaults = uint8(activeVaults.length);
-        // add pending rewards
-        if (numActiveVaults > 0) {
-            addVaultRewards();
-        }
         uint16 totalParts;
-        for (uint16 i=0; i < numActiveVaults; i++) {
-            totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
+        bool notFound = true;
+        if (numActiveVaults > 0) {
+            // verify not already active
+            for (uint16 i=0; i < numActiveVaults; i++) {
+                if (activeVaults[i] == _vault) {
+                    notFound = false;
+                }
+                totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
+            }
+
+            require(notFound, "Vault is already active");
+
+            // add pending rewards
+            addVaultRewards();
         }
         totalParts = totalParts + _multiplier;
         if (startRewardBlock == 0) {
@@ -73,28 +81,33 @@ contract VaultRewardPool is Ownable {
     function retireVault(address _vault) external onlyOwner {
         require(_vault != address(0), "Illegal address");
         
+        // search active vault index
+        bool found = false;
+        uint16 indexToBeDeleted;
+        uint16 totalParts = 0;
+        uint8 numActiveVaults = uint8(activeVaults.length);
+        for (uint8 i=0; i < numActiveVaults; i++) {
+            if (activeVaults[i] == _vault) {
+                indexToBeDeleted = i;
+                found = true;
+            } else {
+                totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
+            }
+        }
+        
+        require(found, "Vault is not active");
+
         // add pending rewards
         addVaultRewards();
         // deactivate vault
         vaultReward[_vault].rewardRate = 0;
         vaultReward[_vault].multiplier = 0;
-        // update activeVaults index
-        uint16 indexToBeDeleted;
-        uint16 totalParts = 0;
-        uint8 numActiveVaults = uint8(activeVaults.length);
-        for (uint16 i=0; i < numActiveVaults; i++) {
-            if (activeVaults[i] == _vault) {
-                indexToBeDeleted = i;
-            } else {
-                totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
-            }
-        }
         if (indexToBeDeleted < numActiveVaults-1) {
             activeVaults[indexToBeDeleted] = activeVaults[numActiveVaults-1];
         }
         activeVaults.pop();
         numActiveVaults--;
-        // activate rewards rate
+        // update rewards rate
         for (uint16 i=0; i < numActiveVaults; i++) {
             vaultReward[activeVaults[i]].rewardRate = uint256(1e18).mul(vaultReward[activeVaults[i]].multiplier).div(totalParts);
         }

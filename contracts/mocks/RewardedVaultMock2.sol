@@ -6,7 +6,8 @@ import "../interfaces/IVaultRewardPool.sol";
 
 contract RewardedVaultMock2 {
 
-    IVaultRewardPool vaultRewardPool;
+    IVaultRewardPool public vaultRewardPool;
+    uint256 public lastBlock = 0;
 
     constructor (
         address _vaultRewardPool
@@ -17,6 +18,11 @@ contract RewardedVaultMock2 {
     function getRewards() public {
         // get vault pending BALLE rewards
         vaultRewardPool.getVaultRewards();
+        lastBlock = block.number;
+    }
+    
+    function getLastBlock() external view returns(uint256) {
+        return lastBlock;
     }
     
 }
