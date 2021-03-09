@@ -22,15 +22,15 @@ module.exports = async function (deployer, network, accounts) {
     console.log(`TX: ${result.tx}`);
     txRegistry.push(result.tx);
 
-    result = await balleToken.mint(rewardPoolAddress, 13000)
+    result = await balleToken.mint(rewardPoolAddress, "13000000000000000000000")
     console.log(`TX: ${result.tx}`);
     txRegistry.push(result.tx);
 
-    result = await balleToken.mint(vaultRewardPoolAddress, 24000)
+    result = await balleToken.mint(vaultRewardPoolAddress, "24000000000000000000000")
     console.log(`TX: ${result.tx}`);
     txRegistry.push(result.tx);
 
-    result = await balleToken.mint(devTeamTimelockAddress, 600)
+    result = await balleToken.mint(devTeamTimelockAddress, "600000000000000000000")
     console.log(`TX: ${result.tx}`);
     txRegistry.push(result.tx);
 

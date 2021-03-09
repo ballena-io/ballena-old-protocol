@@ -64,15 +64,14 @@ module.exports = async function (deployer, network, accounts) {
     const wbnb = networkConfig.WBNB;
     const cake = networkConfig.CAKE;
     // Vault data
-    const pancakePairAddress = networkConfig.pancakePairAddress;
+    const pancakePairAddress = networkConfig.CakeLP_bALBT_BNB;
     const name = 'Balle Pancake bALBT-BNB';
     const symbol = 'ballePancakeBALBT-BNB';
-    const approvalDelay = 60;
-    const rewardMultiplier = 100;
+    const approvalDelay = 28800;
     // Strategy data
     const pancakeRouterAddress = networkConfig.pancakeRouterAddress;
     const masterChefAddress = networkConfig.masterChefAddress;
-    const poolId = 1;
+    const poolId = 49;
 
     let nonce = await web3.eth.getTransactionCount(accounts[0])
     console.log('NONCE: ', nonce)

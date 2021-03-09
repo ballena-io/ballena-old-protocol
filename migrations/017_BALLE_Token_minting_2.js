@@ -17,7 +17,7 @@ module.exports = async function (deployer, network, accounts) {
     const balleToken = await BALLE.at(balleAddress);
 
     for (i=0; i < devTeamVestingAddress.length - 1; i++) {
-      let result = await balleToken.mint(devTeamVestingAddress[i], 400)
+      let result = await balleToken.mint(devTeamVestingAddress[i], "400000000000000000000")
       console.log(`TX: ${result.tx}`);
       txRegistry.push(result.tx);
     }
