@@ -178,7 +178,7 @@ contract VaultRewardPool is Ownable {
             balle.transfer(activeVaults[i], reward);
         }
     }
-
+    
     /**
      * @dev Function called from each vault to widthdraw its pending rewards
      */
