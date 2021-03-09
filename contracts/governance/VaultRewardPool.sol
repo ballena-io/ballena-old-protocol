@@ -39,6 +39,11 @@ contract VaultRewardPool is Ownable {
         balle = IERC20(_balle);
     }
 
+    /**
+     * @dev Activates the vault to receive the BALLE distribution rewards
+     * @param _vault the vault to activate.
+     * @param _multiplier the multiplier to use on block reward distribution among vaults.
+     */
     function activateVault(address _vault, uint16 _multiplier) external onlyOwner {
         require(_vault != address(0), "Illegal address");
         require(_multiplier <= 10000, "Multiplier too high");
@@ -78,6 +83,10 @@ contract VaultRewardPool is Ownable {
         emit ActivateVault(_vault, _multiplier);
     }
 
+    /**
+     * @dev Retires the vault, it stops to receive the BALLE distribution rewards
+     * @param _vault the vault to deactivate.
+     */
     function retireVault(address _vault) external onlyOwner {
         require(_vault != address(0), "Illegal address");
         
@@ -115,6 +124,11 @@ contract VaultRewardPool is Ownable {
         emit RetireVault(_vault);
     }
 
+    /**
+     * @dev Updates the vault's multiplier used to distribute the block reward among the vaults
+     * @param _vault the vault to update.
+     * @param _multiplier the multiplier to use on block reward distribution among vaults.
+     */
     function updateMultiplier(address _vault, uint16 _multiplier) external onlyOwner {
         require(_vault != address(0), "Illegal address");
         require(_multiplier <= 10000, "Multiplier too high");
@@ -147,6 +161,9 @@ contract VaultRewardPool is Ownable {
         emit UpdateMultiplier(_vault, _multiplier);
     }
 
+    /**
+     * @dev Internal function to force a widthdrawal of pending rewards to all vaults because of a change in distribution
+     */
     function addVaultRewards() internal {
         require(activeVaults.length > 0, "No active vaults found");
         require(startRewardBlock > 0, "No started");
@@ -162,9 +179,9 @@ contract VaultRewardPool is Ownable {
         }
     }
 
-    /*
-    * @dev This function allows a single vault to get his rewards
-    */
+    /**
+     * @dev Function called from each vault to widthdraw its pending rewards
+     */
     function getVaultRewards() external {
         if (vaultReward[msg.sender].multiplier > 0 && startRewardBlock > 0) {
             uint256 blocks = uint256(block.number).sub(vaultReward[msg.sender].lastPaidBlock);
