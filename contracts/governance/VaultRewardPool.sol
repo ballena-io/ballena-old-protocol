@@ -49,7 +49,7 @@ contract VaultRewardPool is Ownable {
         bool notFound = true;
         if (numActiveVaults > 0) {
             // verify not already active
-            for (uint16 i=0; i < numActiveVaults; i++) {
+            for (uint8 i=0; i < numActiveVaults; i++) {
                 if (activeVaults[i] == _vault) {
                     notFound = false;
                 }
@@ -71,7 +71,7 @@ contract VaultRewardPool is Ownable {
         vaultReward[_vault].rewardRate = 0;
         vaultReward[_vault].multiplier = _multiplier;
         // activate rewards rate
-        for (uint16 i=0; i < numActiveVaults; i++) {
+        for (uint8 i=0; i < numActiveVaults; i++) {
             vaultReward[activeVaults[i]].rewardRate = uint256(1e18).mul(vaultReward[activeVaults[i]].multiplier).div(totalParts);
         }
 
@@ -83,7 +83,7 @@ contract VaultRewardPool is Ownable {
         
         // search active vault index
         bool found = false;
-        uint16 indexToBeDeleted;
+        uint8 indexToBeDeleted;
         uint16 totalParts = 0;
         uint8 numActiveVaults = uint8(activeVaults.length);
         for (uint8 i=0; i < numActiveVaults; i++) {
@@ -108,7 +108,7 @@ contract VaultRewardPool is Ownable {
         activeVaults.pop();
         numActiveVaults--;
         // update rewards rate
-        for (uint16 i=0; i < numActiveVaults; i++) {
+        for (uint8 i=0; i < numActiveVaults; i++) {
             vaultReward[activeVaults[i]].rewardRate = uint256(1e18).mul(vaultReward[activeVaults[i]].multiplier).div(totalParts);
         }
 
@@ -120,15 +120,27 @@ contract VaultRewardPool is Ownable {
         require(_multiplier <= 10000, "Multiplier too high");
         require(_multiplier > 0, "Multiplier too low");
         
+        // search active vault index
+        bool found = false;
+        uint16 totalParts = 0;
+        uint8 numActiveVaults = uint8(activeVaults.length);
+        for (uint8 i=0; i < numActiveVaults; i++) {
+            if (activeVaults[i] == _vault) {
+                found = true;
+            } else {
+                totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
+            }
+        }
+        
+        require(found, "Vault is not active");
+
         // add pending rewards
         addVaultRewards();
+
+        // update multiplier
         vaultReward[_vault].multiplier = _multiplier;
-        uint16 totalParts;
-        uint8 numActiveVaults = uint8(activeVaults.length);
-        for (uint16 i=0; i < numActiveVaults; i++) {
-            totalParts = totalParts + vaultReward[activeVaults[i]].multiplier;
-        }
-        for (uint16 i=0; i < numActiveVaults; i++) {
+        totalParts = totalParts + _multiplier;
+        for (uint8 i=0; i < numActiveVaults; i++) {
             vaultReward[activeVaults[i]].rewardRate = uint256(1e18).mul(vaultReward[activeVaults[i]].multiplier).div(totalParts);
         }
 

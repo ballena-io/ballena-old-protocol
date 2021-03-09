@@ -1,4 +1,3 @@
-import { start } from "node:repl"
 import { VaultRewardPoolInstance, RewardedVaultMock1Instance, RewardedVaultMock2Instance } from "../types/truffle-contracts"
 
 contract.only('VaultRewardPool', ([owner, account1, account2, account3, account4]) => {
@@ -67,7 +66,7 @@ contract.only('VaultRewardPool', ([owner, account1, account2, account3, account4
             await balleInstance.mint(vaultRewardPoolInstance.address, toBN(24e18))
             
             // activate first vault
-            let tx = await vaultRewardPoolInstance.activateVault(rewardedVaultMock1Instance.address, 1)
+            let tx = await vaultRewardPoolInstance.activateVault(rewardedVaultMock1Instance.address, 100)
             const startBlock = tx.receipt.blockNumber
 
             // do some transactions to get blocks mined
@@ -99,7 +98,7 @@ contract.only('VaultRewardPool', ([owner, account1, account2, account3, account4
             const startBlock = await rewardedVaultMock1Instance.getLastBlock()
 
             // activate vault 2
-            let tx = await vaultRewardPoolInstance.activateVault(rewardedVaultMock2Instance.address, 3)
+            let tx = await vaultRewardPoolInstance.activateVault(rewardedVaultMock2Instance.address, 300)
             const endBlock = tx.receipt.blockNumber
             // save last block for next test
             prevLastBlock = toBN(endBlock)
@@ -128,7 +127,7 @@ contract.only('VaultRewardPool', ([owner, account1, account2, account3, account4
             const startBlock = prevLastBlock
 
             // modify vault 1 multiplier
-            let tx = await vaultRewardPoolInstance.updateMultiplier(rewardedVaultMock1Instance.address, 2)
+            let tx = await vaultRewardPoolInstance.updateMultiplier(rewardedVaultMock1Instance.address, 200)
             const endBlock = tx.receipt.blockNumber
             // save last block for next test
             prevLastBlock = toBN(endBlock)
@@ -239,19 +238,29 @@ contract.only('VaultRewardPool', ([owner, account1, account2, account3, account4
                 .to.be.equals('Vault is not active')
         })
 
+        it('should not allow to change multiplier on inactive vault', async () => {
+            const res = await vaultRewardPoolInstance.updateMultiplier(rewardedVaultMock1Instance.address, 100)
+                .catch((err: Error) => err)
+
+            expect(res)
+                .to.be.an.instanceOf(Error)
+                .and.to.have.property('reason')
+                .to.be.equals('Vault is not active')
+        })
+
         it('should activate vault 1', async () => {
             const balleInstance = await BALLE.deployed()
             await balleInstance.addMinter(owner);
             
             // activate vault 1
-            let tx = await vaultRewardPoolInstance.activateVault(rewardedVaultMock1Instance.address, 1)
+            let tx = await vaultRewardPoolInstance.activateVault(rewardedVaultMock1Instance.address, 100)
             const startBlock = tx.receipt.blockNumber
 
             expect(true)
         })
 
         it('should not allow to activate vault 1 again', async () => {
-            const res = await vaultRewardPoolInstance.activateVault(rewardedVaultMock1Instance.address, 1)
+            const res = await vaultRewardPoolInstance.activateVault(rewardedVaultMock1Instance.address, 100)
                 .catch((err: Error) => err)
 
             expect(res)
