@@ -167,9 +167,6 @@ contract BalleRewardedVaultV2 is ERC20, Ownable {
      * tokens are burned in the process.
      */
     function withdraw(uint256 _shares) public updateReward(msg.sender) {
-        // get vault pending BALLE rewards
-        vaultRewardPool.getVaultRewards();
-
         uint256 r = (balance().mul(_shares)).div(totalSupply());
         uint256 bb = balle.balanceOf(address(this));
         uint256 reward = (bb.mul(_shares)).div(totalSupply());
@@ -232,7 +229,7 @@ contract BalleRewardedVaultV2 is ERC20, Ownable {
      */
     modifier updateReward(address _account) {
         require(_account != address(0), "Illegal address");
-        // get generated rewards
+        // get vault pending BALLE rewards
         vaultRewardPool.getVaultRewards();
         // get rate
         uint256 reward = balle.balanceOf(address(this)).sub(rewardPerTokenStored.mul(totalSupply()));
