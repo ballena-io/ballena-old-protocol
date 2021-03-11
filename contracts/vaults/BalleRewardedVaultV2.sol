@@ -18,7 +18,7 @@ import "../interfaces/IVaultRewardPool.sol";
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract BalleRewardedVaultV2 is ERC20, Ownable {
+contract BalleRewardedVaultV2 is ERC20, Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;

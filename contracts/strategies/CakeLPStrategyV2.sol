@@ -1,4 +1,4 @@
-// contracts/strategies/CakeLPStrategyV1.sol
+// contracts/strategies/CakeLPStrategyV2.sol
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.4;
 
@@ -25,7 +25,7 @@ import "../interfaces/IMasterChef.sol";
  * 
  * This strat is currently compatible with all LP pools.
  */
-contract CakeLPStrategyV1 is Ownable, Pausable {
+contract CakeLPStrategyV2 is Ownable, Pausable {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
