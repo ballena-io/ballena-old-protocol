@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../interfaces/IStrategy.sol";
 import "../interfaces/IVaultRewardPool.sol";
 
@@ -18,7 +17,7 @@ import "../interfaces/IVaultRewardPool.sol";
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract BalleRewardedVaultV2 is ERC20, Ownable, ReentrancyGuard {
+contract BalleRewardedVaultV2 is ERC20, Ownable {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
@@ -182,7 +181,7 @@ contract BalleRewardedVaultV2 is ERC20, Ownable, ReentrancyGuard {
             }
         }
 
-        getReward();
+        _getReward();
         token.safeTransfer(msg.sender, r);
     }
 
@@ -229,7 +228,11 @@ contract BalleRewardedVaultV2 is ERC20, Ownable, ReentrancyGuard {
         // get rate
         uint256 reward = balle.balanceOf(address(this)).sub(rewardPerTokenStored.mul(totalSupply()));
         uint256 rewardTime = block.timestamp.sub(lastUpdateTime);
-        rewardRate = reward.div(rewardTime);
+        if (rewardTime == 0) {
+            rewardRate = 0;
+        } else {
+            rewardRate = reward.div(rewardTime);
+        }
         // distribution
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = block.timestamp;
@@ -268,15 +271,22 @@ contract BalleRewardedVaultV2 is ERC20, Ownable, ReentrancyGuard {
     }
 
     /**
-     * @dev Withdrawal of rewards.
+     * @dev Internal function for withdrawal of rewards.
      */
-    function getReward() public updateReward(msg.sender) nonReentrant() {
+    function _getReward() internal {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
             balle.transfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);
         }
+    }
+
+    /**
+     * @dev Withdrawal of rewards.
+     */
+    function getReward() public updateReward(msg.sender) {
+        _getReward();
     }
 
 }
