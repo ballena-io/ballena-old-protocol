@@ -168,11 +168,6 @@ contract BalleRewardedVaultV2 is ERC20, Ownable, ReentrancyGuard {
      */
     function withdraw(uint256 _shares) public updateReward(msg.sender) {
         uint256 r = (balance().mul(_shares)).div(totalSupply());
-        uint256 bb = balle.balanceOf(address(this));
-        uint256 reward = (bb.mul(_shares)).div(totalSupply());
-        if (bb < reward) {
-            reward = bb;
-        }
 
         _burn(msg.sender, _shares);
 
